@@ -1,4 +1,12 @@
 import { createApp } from 'vue'
 import Catalog from './components/Catalog.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import routes from './router';
+import App from './App.vue';
 
-createApp(Catalog).mount('#app')
+const router = createRouter({
+    history: createWebHistory(),
+    routes,
+});
+
+createApp(App).use(router).mount('#app');
