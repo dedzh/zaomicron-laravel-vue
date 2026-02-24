@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина - MICRON</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800;900&family=Arimo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/zao-refactor-slim-backend/web/style/style.css"">
+</head>
+<body>
+    <!-- Трекеры -->
+    <div class="uxs-3505po1123 uxs-byttepu" id="uxs_container"></div>
+    
+    <!-- Инфо-бар -->
+    <div class="header-info-bar">
+        <div class="container">
+            <div class="header-info-content">
+                <ul class="header-info-links">
+                    <li><a href="#delivery">Доставка</a></li>
+                    <li><a href="#payment">Оплата</a></li>
+                    <li><a href="#warranty">Гарантия</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="partners.html">Партнерам</a></li>
+                </ul>
+                <div>
+                    <a href="account.html">Вход</a>
+                    <span style="margin: 0 10px; opacity: 0.5;">|</span>
+                    <a href="#register">Регистрация</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Основная шапка -->
+    <header class="site-header">
+    <div class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/zao-refactor-slim-backend/web/index.html" class="logo">
+                    <!-- Маленький значок logo1 -->
+                    <img src="/zao-refactor-slim-backend/img/logo1.gif"class="logo-image">
+                    
+                    <!-- Текстовый логотип -->
+                    <div class="logo-text">
+                        <img src="/zao-refactor-slim-backend/img/logo.png" class="logo-full"> 
+                        <div class="logo-tagline">Контрольно-измерительные приборы</div>
+                    </div>
+                </a>
+
+
+                    <div class="search-block">
+                        <form class="search-form" role="search">
+                            <input type="search" class="search-input" placeholder="Поиск по каталогу...">
+                            <button type="submit" class="search-button">Найти</button>
+                        </form>
+                    </div>
+
+                    <div class="user-actions">
+                        <a href="#compare" class="action-button">
+                            <div class="action-icon">⚖️</div>
+                            <span>Сравнить</span>
+                        </a>
+                        <a href="#favorites" class="action-button">
+                            <div class="action-icon">❤️</div>
+                            <span>Избранное</span>
+                            <div class="action-badge">3</div>
+                        </a>
+                        <a href="cart.html" class="action-button">
+                            <div class="action-icon">🛒</div>
+                            <span>Корзина</span>
+                            <div class="action-badge">5</div>
+                        </a>
+                        <a href="account.html" class="action-button">
+                            <div class="action-icon">👤</div>
+                            <span>Кабинет</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="main-navigation">
+            <div class="container">
+                <ul class="nav-menu">
+                    <li class="nav-item has-dropdown">
+                        <a href="catalog.html" class="nav-link">Каталог</a>
+                        <div class="dropdown-menu">
+                            <a href="catalog.html?category=manometers" class="dropdown-item">Манометры</a>
+                            <a href="catalog.html?category=thermometers" class="dropdown-item">Термометры</a>
+                            <a href="catalog.html?category=flowmeters" class="dropdown-item">Расходомеры</a>
+                            <a href="catalog.html?category=analyzers" class="dropdown-item">Анализаторы</a>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a href="service.html" class="nav-link">Услуги</a></li>
+                    <li class="nav-item"><a href="blog.html" class="nav-link">Блог</a></li>
+                    <li class="nav-item"><a href="news.html" class="nav-link">Новости</a></li>
+                    <li class="nav-item"><a href="partners.html" class="nav-link">Партнерам</a></li>
+                    <li class="nav-item"><a href="contacts.html" class="nav-link">Контакты</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <div class="container">
+            <ul class="breadcrumbs-list">
+                <li><a href="index.html">Главная</a></li>
+                <li>Корзина</li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="container">
+            <h1>Корзина</h1>
+            
+            <div class="cart-layout">
+                <!-- Товары -->
+                <div class="cart-items">
+                    <div class="cart-item">
+                        <div class="cart-item-image">📊</div>
+                        <div class="cart-item-info">
+                            <h3>Цифровой манометр DM-100</h3>
+                            <div style="color: #666; margin: 5px 0;">Арт. DM-100-2024</div>
+                            <div style="font-weight: 700; color: #51AE45;">15 800 ₽</div>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <div class="quantity-control">
+                                <button class="quantity-btn">-</button>
+                                <input type="number" class="quantity-input" value="1">
+                                <button class="quantity-btn">+</button>
+                            </div>
+                            <button class="btn btn-secondary" style="margin-top: 10px;">Удалить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-item">
+                        <div class="cart-item-image">🌡️</div>
+                        <div class="cart-item-info">
+                            <h3>Термометр ТП-202</h3>
+                            <div style="color: #666; margin: 5px 0;">Арт. ТП-202-PRO</div>
+                            <div style="font-weight: 700; color: #51AE45;">8 900 ₽</div>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <div class="quantity-control">
+                                <button class="quantity-btn">-</button>
+                                <input type="number" class="quantity-input" value="2">
+                                <button class="quantity-btn">+</button>
+                            </div>
+                            <button class="btn btn-secondary" style="margin-top: 10px;">Удалить</button>
+                        </div>
+                    </div>
+                    
+                    <div class="cart-item">
+                        <div class="cart-item-image">💧</div>
+                        <div class="cart-item-info">
+                            <h3>Расходомер RF-400</h3>
+                            <div style="color: #666; margin: 5px 0;">Арт. RF-400-ULT</div>
+                            <div style="font-weight: 700; color: #51AE45;">45 200 ₽</div>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <div class="quantity-control">
+                                <button class="quantity-btn">-</button>
+                                <input type="number" class="quantity-input" value="1">
+                                <button class="quantity-btn">+</button>
+                            </div>
+                            <button class="btn btn-secondary" style="margin-top: 10px;">Удалить</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Итог -->
+                <div class="cart-summary">
+                    <h2 style="margin-bottom: 20px;">Итого</h2>
+                    
+                    <div class="summary-row">
+                        <span>Товары (4 шт.)</span>
+                        <span>69 900 ₽</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span>Доставка</span>
+                        <span>1 500 ₽</span>
+                    </div>
+                    
+                    <div class="summary-row" style="font-size: 18px; font-weight: 700; color: #51AE45;">
+                        <span>К оплате</span>
+                        <span>71 400 ₽</span>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 15px;">Перейти к оформлению</button>
+                    <a href="catalog.html" class="btn btn-secondary" style="width: 100%; margin-top: 10px; text-align: center; display: block;">Продолжить покупки</a>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px;">
+                        <h4>Способы оплаты</h4>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <span>💳</span>
+                            <span>💴</span>
+                            <span>🏦</span>
+                            <span>📱</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Футер -->
+    <footer class="site-footer">
+        <div class="footer-main">
+            <div class="container">
+                <div class="footer-columns">
+                    <div class="footer-column">
+                        <h3>Компания</h3>
+                        <ul class="footer-links">
+                            <li><a href="#about">О нас</a></li>
+                            <li><a href="#history">История</a></li>
+                            <li><a href="#certificates">Сертификаты</a></li>
+                            <li><a href="#vacancies">Вакансии</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Каталог</h3>
+                        <ul class="footer-links">
+                            <li><a href="catalog.html?category=manometers">Манометры</a></li>
+                            <li><a href="catalog.html?category=thermometers">Термометры</a></li>
+                            <li><a href="catalog.html?category=flowmeters">Расходомеры</a></li>
+                            <li><a href="catalog.html?category=analyzers">Анализаторы</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Услуги</h3>
+                        <ul class="footer-links">
+                            <li><a href="services.html#verification">Поверка</a></li>
+                            <li><a href="services.html#calibration">Калибровка</a></li>
+                            <li><a href="services.html#repair">Ремонт</a></li>
+                            <li><a href="services.html#consulting">Консультации</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-column">
+                        <h3>Контакты</h3>
+                        <address>
+                            <p>Москва, ул. Примерная, 15</p>
+                            <p>Тел: <a href="tel:+74951234567">+7 (495) 123-45-67</a></p>
+                            <p>Email: <a href="mailto:info@zaomicron.ru">info@zaomicron.ru</a></p>
+                        </address>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2026 MICRON. Все права защищены.</p>
+                <p>
+                    <a href="#privacy">Политика конфиденциальности</a> | 
+                    <a href="#agreement">Пользовательское соглашение</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Кнопка чата -->
+    <div class="webim-button">💬</div>
+</body>
+</html>
