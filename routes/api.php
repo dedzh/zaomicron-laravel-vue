@@ -1,10 +1,12 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\SliderController;
 use App\Http\Controllers\Api\PromoController;
 use App\Http\Controllers\Api\TickerController;
 use App\Http\Controllers\Api\FeedbackController;
-
-use App\Http\Controllers\Api\CatalogController;
 
 Route::prefix('catalog')->group(function () {
     Route::get('categories', [CatalogController::class, 'categories']);
