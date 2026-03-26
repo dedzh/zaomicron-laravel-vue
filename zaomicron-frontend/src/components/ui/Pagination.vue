@@ -30,3 +30,31 @@ export default {
   }
 };
 </script>
+<style scoped>
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+.pagination-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.2s;
+}
+.pagination-item.active {
+  background: #51AE45;
+  border-color: #51AE45;
+  color: white;
+}
+.pagination-item:hover:not(.active) {
+  background: #f5f7fa;
+}
+</style>

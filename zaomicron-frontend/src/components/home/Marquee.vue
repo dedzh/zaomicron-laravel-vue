@@ -27,5 +27,5 @@ export default {
 </script>
 
 <style scoped>
-/* Стили для бегущей строки */
+
 </style>

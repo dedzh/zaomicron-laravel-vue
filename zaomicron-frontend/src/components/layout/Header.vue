@@ -15,17 +15,12 @@
           <!-- Поиск -->
           <div class="search-block">
             <form class="search-form" @submit.prevent="handleSearch">
-              <input 
-                type="search" 
-                class="search-input" 
-                v-model="searchQuery" 
-                placeholder="Поиск по каталогу..."
-              >
-              <button type="submit" class="search-button">
-                <i class="fas fa-search"></i>
-                <span class="search-button-text">Найти</span>
-              </button>
-            </form>
+    <input type="search" class="search-input" v-model="searchQuery" placeholder="Поиск по каталогу...">
+    <button type="submit" class="search-button">
+      <i class="fas fa-search"></i>
+      <span class="search-button-text">Найти</span>
+    </button>
+  </form>
           </div>
 
           <!-- Действия пользователя (десктоп) -->
@@ -87,6 +82,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   name: 'Header',
   data() {
@@ -95,9 +91,17 @@ export default {
       mobileMenuOpen: false
     };
   },
-  methods: {
-    handleSearch() {
-      console.log('Поиск:', this.searchQuery);
+   methods: {
+    async handleSearch() {
+      if (!this.searchQuery.trim()) return;
+      try {
+        const { data } = await axios.get(`/api/catalog/search?q=${encodeURIComponent(this.searchQuery)}`);
+        // Переход на страницу результатов или вывод
+        console.log(data);
+        this.$router.push({ path: '/catalog', query: { search: this.searchQuery } });
+      } catch (error) {
+        console.error(error);
+      }
     },
     toggleMobileMenu() {
       this.mobileMenuOpen = !this.mobileMenuOpen;

@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\CatalogController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/{any}', function () {
@@ -8,4 +8,3 @@ Route::get('/{any}', function () {
 Route::get('/', function () {
     return view('home');
 });
-
