@@ -8,3 +8,4 @@ Route::get('/{any}', function () {
 Route::get('/', function () {
     return view('home');
 });
+

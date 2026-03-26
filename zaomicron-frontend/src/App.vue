@@ -1,26 +1,36 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <AppLayout />
+  <div>
+    <TrackerPixel />
+    <InfoBar />
+    <Header />
+    <Navigation />
+    <router-view />
+    <Footer />
+ 
+  </div>
 </template>
 
-<script setup>
-import AppLayout from '@/components/layout/AppLayout.vue'
+<script>
+import TrackerPixel from '@/components/ui/TrackerPixel.vue';
+import InfoBar from '@/components/layout/InfoBar.vue';
+import Header from '@/components/layout/Header.vue';
+import Navigation from '@/components/layout/Navigation.vue';
+import Footer from '@/components/layout/Footer.vue';
+
+
+export default {
+  name: 'App',
+  components: {
+    TrackerPixel,
+    InfoBar,
+    Header,
+    Navigation,
+    Footer
+
+  }
+};
 </script>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+<style>
+@import './style.css';
 </style>

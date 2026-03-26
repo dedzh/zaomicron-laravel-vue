@@ -1,0 +1,47 @@
+<template>
+  <div class="product-card">
+    <div class="product-image">
+      <img v-if="image" :src="image" :alt="name">
+      <span v-else>{{ emoji }}</span>
+      <button 
+        class="favorite-btn" 
+        :class="{ active: isFavorite }"
+        @click.stop="toggleFavorite"
+      >
+        ❤️
+      </button>
+    </div>
+    <div class="product-info">
+      <h3><router-link :to="'/product/' + id">{{ name }}</router-link></h3>
+      <div class="product-sku">Арт. {{ sku }}</div>
+      <div class="product-price">{{ price }} ₽</div>
+      <button class="btn btn-primary" @click="addToCart">В корзину</button>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'ProductCard',
+  props: {
+    id: [String, Number],
+    name: String,
+    sku: String,
+    price: [String, Number],
+    emoji: String,
+    image: String,
+    isFavorite: Boolean
+  },
+  methods: {
+    addToCart() {
+      this.$emit('add-to-cart', { id: this.id, name: this.name, price: this.price });
+    },
+    toggleFavorite() {
+      this.$emit('toggle-favorite', this.id);
+    }
+  }
+};
+</script>
+
+<style scoped>
+</style>

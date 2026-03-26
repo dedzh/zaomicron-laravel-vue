@@ -1,14 +1,25 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col>
-        <h1>Главная страница</h1>
-        <v-btn color="primary">Кнопка Vuetify</v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div>
+    <HeroSlider />
+    <PromoGrid />
+    <Marquee />
+    <ProductGrid />
+  </div>
 </template>
 
-<script setup>
-// Здесь будет логика главной страницы
+<script>
+import HeroSlider from '@/components/home/HeroSlider.vue';
+import PromoGrid from '@/components/home/PromoGrid.vue';
+import Marquee from '@/components/home/Marquee.vue';
+import ProductGrid from '@/components/home/ProductGrid.vue';
+
+export default {
+  name: 'Home',
+  components: {
+    HeroSlider,
+    PromoGrid,
+    Marquee,
+    ProductGrid
+  }
+};
 </script>

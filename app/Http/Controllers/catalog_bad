@@ -1,0 +1,267 @@
+<?php
+	$where = $_POST['where'];
+	echo $where;
+	$what_tovar = $_POST['what_tovar'];
+	echo $what_tovar;
+?>
+<?
+$where = $_POST['where'];
+
+session_start();
+$id = $HTTP_SERVER_VARS["QUERY_STRING"];
+
+/*
+list($a1,$a2,$a3,$a4,$a5)=explode("&", $HTTP_SERVER_VARS["QUERY_STRING"]); 
+list($glob,$word)=explode("=", $a1); $$glob = $word; 
+list($glob,$word)=explode("=", $a2); $$glob = $word; 
+list($glob,$word)=explode("=", $a3); $$glob = $word; 
+list($glob,$word)=explode("=", $a4); $$glob = $word; 
+list($glob,$word)=explode("=", $a5); $$glob = $word; 
+list($glob,$word)=explode("=", $a6); $$glob = $word; 
+foreach ( $HTTP_COOKIE_VARS as $key => $value ) {$$key=$value;} 
+$PARAMS = (isset($HTTP_POST_VARS)) ? $HTTP_POST_VARS : $HTTP_GET_VARS; foreach ( $PARAMS as $key => $value ) {$$key=$value;} 
+*/
+require("/home/u28705/zaomicron.ru/www/scripts/mysql.php"); 
+
+
+	$_SESSION["kol"] = 0;
+
+foreach($_SESSION['coun_p'] as $key1 => $val1){
+	if ($co_p[$key1] == null){
+		unset($val1);
+		}
+
+$_SESSION['coun_p'][$what_tovar] = $co_p[$what_tovar];
+
+	$_SESSION["kol"]++;
+	$query = "select `price` from `magazin` where `code`=$key1";
+	$result = MYSQL_QUERY($query);
+	$row = mysql_fetch_row($result);
+	$sum=$sum+($row[0]*$val1);
+
+	}  
+
+$_SESSION['s'] = $sum.' руб.';
+
+if ($where == "search") {
+
+	header ("Location: /search/search.php?search=".$what."&page=".$pg); 
+
+} else if ($where == "online_in") {
+
+echo "<HTML><HEAD> 
+         <META HTTP-EQUIV='Refresh' CONTENT='0; URL=/online_in/$id.html'> 
+        </HEAD></HTML>"; 
+header ("Location: /online_in/".$id.".html"); 
+} else {
+
+echo "<HTML><HEAD> 
+         <META HTTP-EQUIV='Refresh' CONTENT='0; URL=/online/$id.html'> 
+        </HEAD></HTML>"; 
+header ("Location: /online/".$id.".html"); 
+
+}
+
+
+
+exit;
+?>
+<?php 
+$id = $_SERVER['QUERY_STRING'];
+session_start();
+$where = $_POST['where'];
+$what = $_POST['what'];
+$pg = $_POST['page'];
+$what_tovar = $_POST['what_tovar'];
+$co_p = $_POST['co_p'];
+
+$udal = $_POST['udal'];
+
+
+
+      $_SESSION['coun_p'][$what_tovar] = $co_p[$what_tovar];
+	echo $co_p[$what_tovar];
+	$_SESSION["kol"] = 1;
+if ($where == "search") {
+
+	
+	header ("Location: /search/search.php?search=".$what."&page=".$pg); 
+
+} else  if ($where == "online_in") {
+
+
+header ("Location: /online_in/".$id.".html"); 
+} else {
+
+/*
+echo "<HTML><HEAD> 
+         <META HTTP-EQUIV='Refresh' CONTENT='0; URL=/online/$id.html'> 
+        </HEAD></HTML>"; 
+header ("Location: /online/".$id.".html"); 
+*/
+}
+exit;
+<?php 
+$id = $_SERVER['QUERY_STRING'];
+$db = mysqli_connect("172.18.0.1", "micron", "Gf66EtSN6L2Cvbm9", "micron");
+$query2 = "SET character_set_results = utf8";
+$result2 = mysqli_query($db, $query2);
+
+$query = "select parent from magazin where `code`='$id'";
+$result = mysqli_QUERY($db,$query);
+$row = mysqli_fetch_row($result);
+if ($row[0] != 76488){
+$query = "select parent from magazin where `code`='$row[0]'";
+$result = mysqli_QUERY($db,$query);
+$row = mysqli_fetch_row($result);
+}
+
+
+if ($row[0] == 76488){
+
+
+include ($_SERVER['DOCUMENT_ROOT']."/scripts/top_y");
+
+echo '<table class=subb_a border=0 cellspacing=0 cellpadding=0>';
+$query = "select name,code from magazin where `parent`='76488'";
+$result = mysqli_QUERY($db,$query);
+
+while($row = mysqli_fetch_row($result)){
+
+$query_ano = "select code from magazin where `parent` = (select code from magazin where `parent`='$row[1]' LIMIT 0,1)"; //tui
+$result_ano = mysqli_QUERY($db,$query_ano);
+$total_rows_ano = mysqli_num_rows($result_ano);
+
+		$query_tr = "select translit_url from translit_hortz_new_add where `id`='$row[1]'";
+		$result_tr = mysqli_QUERY($db,$query_tr);
+		$row_tr = mysqli_fetch_row($result_tr);
+
+if ($total_rows_ano != 0) {
+
+
+if ($id == $row[1]) {
+	echo '<tr><td style="padding-top: 5pt;"><a href=/catalog/kalibryi_promyishlennyie>'.$row[0].'</a></td></tr>';
+} else {
+	echo '<tr><td style="padding-top: 5pt;"><a href=/catalog/'.$row_tr[0].'>'.$row[0].'</a></td></tr>';
+}
+
+
+
+//	echo '<tr><td style="padding-top: 5pt;"><a href=/catalog/'.$row_tr[0].'>'.$row[0].'</a></</td></tr>';
+
+}
+
+if ($id == $row[1]){
+
+$query1 = "select name,code from magazin where `parent`='$id'";
+$result1 = mysqli_QUERY($db,$query1);
+
+while($row1 = mysqli_fetch_row($result1)){
+if ($row1[0] == "��������������  ������.") {$row1[0] = "�������������� �����������";}
+if ($row1[0] == "����� �������.") {$row1[0] = "����� ����������";}
+
+
+//tui3
+
+// echo $row1[1];
+
+
+$query_ano0 = "select product from magazin where `parent`='$row1[1]' LIMIT 0,1"; //tui
+$result_ano0 = mysqli_QUERY($db,$query_ano0);
+$total_rows_ano0 = mysqli_num_rows($result_ano0);
+$row0 = mysqli_fetch_row($result_ano0);
+
+		$query_tr = "select translit_url from translit_hortz_new_add where `id`='$row1[1]'";
+		$result_tr = mysqli_QUERY($db,$query_tr);
+		$row_tr = mysqli_fetch_row($result_tr);
+
+
+if ($row0[0] == 1){
+	echo '<tr><td colspan=2 style="padding-left: 15pt; padding-top: 5pt;"><a href=/catalog/'.$row_tr[0].'>'.$row1[0].'</a></td></tr>';
+}
+
+}} else {
+$query1 = "select parent from magazin where `code`='$id'";
+$result1 = mysqli_QUERY($db,$query1);
+$row1 = mysqli_fetch_row($result1);
+
+if ($row[1] == $row1[0])
+{
+$query2 = "select name,code from magazin where `parent`='$row1[0]'";
+$result2 = mysqli_QUERY($db,$query2);
+
+while($row2 = mysqli_fetch_row($result2)){
+
+if ($row2[0] == "��������������  ������.") {$row2[0] = "�������������� �����������";}
+if ($row2[0] == "����� �������.") {$row2[0] = "����� ����������";}
+
+if ($row2[1] == $id){
+	echo '<tr><td colspan=2 style="padding-left: 15pt; padding-top: 5pt;"><b class=is_s>'.$row2[0].'</b></td></tr>';
+}
+else {
+//tui4
+
+
+$query_ano0 = "select product from magazin where `parent`='$row2[1]' LIMIT 0,1"; //tui
+$result_ano0 = mysqli_QUERY($db,$query_ano0);
+$total_rows_ano0 = mysqli_num_rows($result_ano0);
+$row0 = mysqli_fetch_row($result_ano0);
+
+		$query_tr = "select translit_url from translit_hortz_new_add where `id`='$row2[1]'";
+		$result_tr = mysqli_QUERY($db,$query_tr);
+		$row_tr = mysqli_fetch_row($result_tr);
+
+
+
+if ($row0[0] == 1){
+	echo '<tr><td colspan=2 style="padding-left: 15pt; padding-top: 5pt;"><a href=/catalog/'.$row_tr[0].'>'.$row2[0].'</a></td></tr>';
+}
+
+}}}}}
+
+echo '</table>';
+include ("/home/u28705/zaomicron.ru/www/scripts/bottom_y");
+}
+
+else {
+if ($id == 76488) {
+$db = mysqli_CONNECT("u28705.mysql.masterhost.ru","u28705","LAT2DING.Ni") OR DIE("Unable to connect");
+
+if($db) {
+  mysqli_select_db("u28705");
+
+  if(mysqli_errno() == 0) {
+    mysqli_set_charset('utf8');
+
+    //��������� ������ � ����, �������� ����� � utf8.
+  } else {
+    echo(mysqli_error());
+  }
+}
+
+include ("/home/u28705/zaomicron.ru/www/scripts/top_y");
+
+echo '<table class=subb_a border=0 cellspacing=0 cellpadding=0>';
+
+$query = "select name,code from magazin where `parent`='76488'";
+$result = mysqli_QUERY($db,$query);
+if ($id != "id"){
+}
+
+while($row = mysqli_fetch_row($result)){
+$query_ano1 = "select code from magazin where `parent` = (select code from magazin where `parent`='$row[1]' LIMIT 0,1)"; //tui
+$result_ano1 = mysqli_QUERY($db,$query_ano1);
+$total_rows_ano1 = mysqli_num_rows($result_ano1);
+
+		$query_tr = "select translit_url from translit_hortz_new_add where `id`='$row[1]'";
+		$result_tr = mysqli_QUERY($db,$query_tr);
+		$row_tr = mysqli_fetch_row($result_tr);
+
+if ($total_rows_ano1 != 0){
+	echo '<tr><td style="padding-top: 5pt;"><a href=/catalog/'.$row_tr[0].'>'.$row[0].'</a></</td></tr>';
+}
+
+}
+echo '<tr><td><br><br></td></tr></table>';
+include ($_SERVER['DOCUMENT_ROOT']."/scripts/bottom_y");
+}}

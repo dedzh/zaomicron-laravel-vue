@@ -4,9 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-<div id="app"></div>
+    <div id="app"></div>
 
-@vite('resources/js/app.js')
+    @vite('resources/js/app.js')
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
@@ -15,7 +15,7 @@
 
     <!-- Styles / Scripts -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['zaomicron-frontend/src/main.js'])
     @else
     <style>
         /*! tailwindcss v4.0.7 | MIT License | https://tailwindcss.com */

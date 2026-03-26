@@ -1,18 +1,11 @@
-import App from './App.vue'
-import { createRouter, createWebHistory } from 'vue-router'
-import vuetify from './plugins/vuetify'
 import { createApp } from 'vue'
 import './style.css'
-const router = createRouter({
-  history: createWebHistory(),          // используем обычные URL (без #)
-  routes: [
-    { path: '/', component: () => import('./views/Home.vue') },
-    { path: '/:pathMatch(.*)*', component: () => import('./views/NotFound.vue') }
-  ]
-})
+import App from './App.vue'
+import vuetify from './plugins/vuetify'
+import router from './router'
+import '@fortawesome/fontawesome-free/css/all.css';
 
-// Создаём приложение, подключаем роутер и Vuetify
-createApp(App)
-  .use(router)
-  .use(vuetify)
-  .mount('#app')
+const app = createApp(App);
+app.use(router);
+app.use(vuetify);
+app.mount('#app');

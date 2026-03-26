@@ -1,7 +1,20 @@
-import 'vuetify/styles'                // Импорт стилей Vuetify
-import { createVuetify } from 'vuetify' // Функция создания экземпляра Vuetify
+import 'vuetify/styles';
+import { createVuetify } from 'vuetify';
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
 
 export default createVuetify({
-  // Здесь можно добавить настройки темы, иконки и т.д.
-  // Пока оставим пустым – работает с настройками по умолчанию
-})
+  components,
+  directives,
+  theme: {
+    defaultTheme: 'light',
+    themes: {
+      light: {
+        colors: {
+          primary: '#51AE45',
+          secondary: '#f5f7fa'
+        }
+      }
+    }
+  }
+});
