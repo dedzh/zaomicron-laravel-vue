@@ -2,28 +2,26 @@
   <nav class="main-navigation">
     <div class="container">
       <ul class="nav-menu">
-        <li
-          v-for="cat in categories"
-          :key="cat.id"
-          class="nav-item"
-          :class="{ 'has-dropdown': cat.children && cat.children.length }"
-        >
-          <router-link :to="'/catalog/' + cat.id" class="nav-link">{{ cat.name }}</router-link>
-          <div v-if="cat.children && cat.children.length" class="dropdown-menu">
-            <router-link
-              v-for="child in (cat.children || [])"
-              :key="child.id"
-              :to="'/catalog/' + child.id"
-              class="dropdown-item"
-            >
-              {{ child.name }}
-            </router-link>
-          </div>
+
+        <!--пункты меню  -->
+        <li class="nav-item">
+          <router-link to="/catalog" class="nav-link" exact-active-class="active">Каталог</router-link>
         </li>
-        <!-- Статические пункты -->
-        <li class="nav-item"><router-link to="/service" class="nav-link">Услуги</router-link></li>
-        <li class="nav-item"><router-link to="/contacts" class="nav-link">Контакты</router-link></li>
-        <li class="nav-item"><router-link to="/partners" class="nav-link">Партнерам</router-link></li>
+        <li class="nav-item">
+          <router-link to="/service" class="nav-link" exact-active-class="active">Услуги</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/blog" class="nav-link" exact-active-class="active">Блог</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/news" class="nav-link" exact-active-class="active">Новости</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/partners" class="nav-link" exact-active-class="active">Партнерам</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/contacts" class="nav-link" exact-active-class="active">Контакты</router-link>
+        </li>
       </ul>
     </div>
   </nav>
@@ -31,27 +29,45 @@
 
 <script>
 import axios from 'axios';
+import CatalogMenu from '@/components/catalog/CatalogMenu.vue';
 
 export default {
   name: 'Navigation',
+  components: { CatalogMenu },
   data() {
     return {
-      categories: [] // обязательно инициализируем как массив
+      isCatalogOpen: false,
     };
   },
-  async created() {
-    try {
-      const response = await axios.get('/api/catalog/categories');
-      const raw = Array.isArray(response.data) ? response.data : [];
-      // На случай если бэк вернул relation без children/null — делаем безопасную форму.
-      this.categories = raw.map(cat => ({
-        ...cat,
-        children: Array.isArray(cat.children) ? cat.children : []
-      }));
-    } catch (error) {
-      console.error('Ошибка загрузки категорий', error);
-    }
-  }
+  mounted() {
+    document.addEventListener('click', this.handleOutsideClick);
+    document.addEventListener('keydown', this.handleEscKey);
+  },
+  beforeUnmount() {
+    document.removeEventListener('click', this.handleOutsideClick);
+    document.removeEventListener('keydown', this.handleEscKey);
+  },
+  methods: {
+    toggleCatalogMenu() {
+      this.isCatalogOpen = !this.isCatalogOpen;
+    },
+    closeCatalogMenu() {
+      this.isCatalogOpen = false;
+    },
+    handleOutsideClick(event) {
+      if (!this.isCatalogOpen) return;
+      const wrapper = this.$refs.catalogWrapper;
+      const menu = this.$refs.catalogMenu;
+      if (wrapper && !wrapper.contains(event.target) && menu && !menu.$el.contains(event.target)) {
+        this.closeCatalogMenu();
+      }
+    },
+    handleEscKey(event) {
+      if (event.key === 'Escape' && this.isCatalogOpen) {
+        this.closeCatalogMenu();
+      }
+    },
+  },
 };
 </script>
 
@@ -71,7 +87,7 @@ export default {
 
 .nav-menu {
   display: flex;
-  flex-wrap: wrap;          /* перенос на новую строку при нехватке места */
+  flex-wrap: wrap;
   list-style: none;
   gap: 30px;
   margin: 0;
@@ -82,6 +98,7 @@ export default {
   position: relative;
 }
 
+/* Стили для обычных пунктов меню */
 .nav-link {
   display: block;
   padding: 15px 0;
@@ -121,42 +138,33 @@ export default {
   }
 }
 
-/* ===== Выпадающее меню ===== */
-.has-dropdown:hover .dropdown-menu {
-  display: block;
-  animation: fadeIn 0.2s ease;
+/* ===== Кнопка каталога ===== */
+.catalog-item {
+  display: flex;
+  align-items: center;
 }
 
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: white;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  min-width: 200px;
-  z-index: 1000;
-  padding: 8px 0;
-}
-
-.dropdown-item {
-  display: block;
-  padding: 10px 20px;
-  text-decoration: none;
-  color: #333;
-  transition: background 0.2s ease, color 0.2s ease;
+.catalog-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #51AE45;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
   font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-.dropdown-item:hover {
-  background: #f5f7fa;
-  color: #51AE45;
+.catalog-button:hover {
+  background-color: #3e8c34;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+.catalog-button i {
+  font-size: 16px;
 }
 
 /* ===== Адаптивность ===== */
@@ -167,10 +175,13 @@ export default {
   .nav-link {
     font-size: 14px;
   }
+  .catalog-button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 768px) {
-  /* Убираем горизонтальный скролл, разрешаем перенос строк */
   .main-navigation {
     overflow-x: visible;
   }
@@ -178,20 +189,12 @@ export default {
     gap: 15px;
     row-gap: 5px;
   }
-  .nav-item {
-    /* для правильного позиционирования выпадающего меню */
-    position: relative;
+  .catalog-button {
+    padding: 5px 10px;
+    font-size: 12px;
   }
-  .dropdown-menu {
-    position: absolute;
-    left: 0;
-    min-width: 180px;
-    /* на маленьких экранах ограничиваем ширину, чтобы не вылезало за край */
-    max-width: 90vw;
-  }
-  .dropdown-item {
-    padding: 10px 15px;
-    font-size: 13px;
+  .catalog-button i {
+    font-size: 14px;
   }
 }
 
@@ -203,8 +206,9 @@ export default {
     font-size: 13px;
     padding: 12px 0;
   }
-  .dropdown-menu {
-    min-width: 160px;
+  .catalog-button {
+    padding: 4px 8px;
+    font-size: 12px;
   }
 }
 </style>

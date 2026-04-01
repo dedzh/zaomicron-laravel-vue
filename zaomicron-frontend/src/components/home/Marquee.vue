@@ -11,21 +11,53 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'Marquee',
   data() {
     return {
-      newsItems: [
-        { link: '/news/24.html', text: 'АО ТД «Завод «Микрон» присвоен статус «Успешный поставщик»' },
-        { link: '/news/20.html', text: 'АО ТД «Завод «Микрон» - лауреат конкурса «Активный поставщик»' },
-        { link: '/news/23.html', text: 'Специализированная выставка. «Станкостроение. Обработка металлов»' },
-        { link: '/news/22.html', text: 'Микрометры электронные МКЦ PRO' }
-      ]
+      newsItems: []
     };
+  },
+  mounted() {
+    this.fetchNews();
+  },
+  methods: {
+    async fetchNews() {
+      try {
+        const { data } = await axios.get('/api/news');
+        this.newsItems = data.map(item => ({
+          text: item.name,
+          link: `/news/${item.id}`
+        }));
+      } catch (err) {
+        console.error('Ошибка загрузки новостей', err);
+      }
+    }
   }
 };
 </script>
 
 <style scoped>
-
+/* Можно оставить пустым или добавить стили бегущей строки */
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  background: #f0f0f0;
+  padding: 10px 0;
+}
+.marquee-content {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+}
+.marquee-content a {
+  margin-right: 40px;
+  text-decoration: none;
+  color: #333;
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 </style>

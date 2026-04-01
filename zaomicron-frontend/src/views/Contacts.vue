@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>Контакты</h1>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px;">
       <div>
         <h2>Наши контакты</h2>

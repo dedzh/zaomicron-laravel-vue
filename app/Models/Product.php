@@ -24,7 +24,6 @@ class Product extends Model
     // Метод для получения изображения (если есть)
     public function getImageUrl()
     {
-      
         return asset('img/logo.png');
     }
 }

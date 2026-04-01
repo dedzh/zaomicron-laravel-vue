@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import { useFavoritesStore } from '@/stores/favorites';
+
 export default {
   name: 'ProductCard',
   props: {
@@ -28,77 +30,30 @@ export default {
     name: String,
     sku: String,
     price: [String, Number],
-    emoji: String,
+    emoji: { type: String, default: '🛠️' },
     image: String,
-    isFavorite: Boolean
+  },
+  computed: {
+    isFavorite() {
+      const favoritesStore = useFavoritesStore();
+      return favoritesStore.isFavorite(this.id);
+    }
   },
   methods: {
     addToCart() {
-      this.$emit('add-to-cart', { id: this.id, name: this.name, price: this.price });
+      this.$emit('add-to-cart', {
+        id: this.id,
+        name: this.name,
+        sku: this.sku,
+        price: this.price,
+        image: this.image,
+        emoji: this.emoji
+      });
     },
     toggleFavorite() {
-      this.$emit('toggle-favorite', this.id);
+      const favoritesStore = useFavoritesStore();
+      favoritesStore.toggleFavorite(this.id);
     }
   }
 };
 </script>
-
-<style scoped>
-.product-card {
-  background: white;
-  border: 1px solid #eaeef2;
-  border-radius: 8px;
-  overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-}
-.product-image {
-  position: relative;
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f8f9fa;
-}
-.product-image img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-.favorite-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: white;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  font-size: 18px;
-  transition: all 0.2s;
-}
-.favorite-btn.active {
-  color: #ff4444;
-}
-.product-info {
-  padding: 15px;
-}
-.product-info h3 {
-  font-size: 16px;
-  margin-bottom: 5px;
-}
-.product-sku {
-  color: #999;
-  font-size: 12px;
-  margin-bottom: 10px;
-}
-.product-price {
-  font-weight: 700;
-  color: #51AE45;
-  margin-bottom: 15px;
-}
-</style>

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>Формы</h1>
     <div style="display: flex; gap: 10px; margin: 30px 0; border-bottom: 1px solid #eee; padding-bottom: 10px;">
       <button
         v-for="form in formTypes"

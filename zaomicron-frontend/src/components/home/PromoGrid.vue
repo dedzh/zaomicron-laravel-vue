@@ -22,45 +22,31 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'PromoGrid',
   data() {
     return {
-      promoItems: [
-        {
-          id: 1,
-          link: './online/76259.html',
-          image: '@/assets/micrometer.png',
-          title: 'Микрометры',
-          description: 'Точные измерения до микрометра'
-        },
-        {
-          id: 2,
-          link: '/online/76255.html',
-          image: './assets/slider_5.jpgpressure-gauge.png',
-          title: 'Индикаторы',
-          description: 'Часовые и цифровые индикаторы'
-        },
-        {
-          id: 3,
-          link: '/online/76488.html',
-          image: './assets/thermometers.png',
-          title: 'Термометр',
-          description: 'Промышленные и нефтяные калибры'
-        },
-        {
-          id: 4,
-          link: '/online/76278.html',
-          image: './assets/vernier-caliper.png',
-          title: 'Штангенциркули',
-          description: 'Точные измерения длин и диаметров'
-        }
-      ]
+      promoItems: []
     };
+  },
+  mounted() {
+    this.fetchPromo();
+  },
+  methods: {
+    async fetchPromo() {
+      try {
+        const { data } = await axios.get('/api/main/promo');
+        this.promoItems = data;
+      } catch (err) {
+        console.error('Ошибка загрузки промо', err);
+      }
+    }
   }
 };
 </script>
 
-<style>
-@import '@/style.css'; 
+<style scoped>
+/* Оставить существующие стили, но добавить адаптивность при необходимости */
 </style>

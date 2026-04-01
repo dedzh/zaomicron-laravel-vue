@@ -85,6 +85,7 @@
 
 <script>
 import axios from 'axios';
+import { addToCart as addToCartUtil } from '@/utils/cart';
 
 export default {
   data() {
@@ -128,7 +129,16 @@ export default {
       if (this.quantity > 1) this.quantity--;
     },
     addToCart() {
-      console.log('Добавлено в корзину:', { ...this.product, quantity: this.quantity });
+      addToCartUtil(
+        {
+          id: this.product?.id,
+          name: this.product?.name,
+          sku: this.product?.sku,
+          price: this.product?.price,
+          emoji: this.product?.emoji
+        },
+        this.quantity
+      );
     },
     toggleFavorite() {
       this.isFavorite = !this.isFavorite;

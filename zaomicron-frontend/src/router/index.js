@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
+
 const routes = [
   { path: '/', name: 'home', component: () => import('@/views/Home.vue') },
  { path: '/catalog/:id?', name: 'catalog', component: () => import('@/views/Catalog.vue') },
   { path: '/product/:id', name: 'product', component: () => import('@/views/Product.vue') },
   { path: '/cart', name: 'cart', component: () => import('@/views/Cart.vue') },
+  { path: '/favorites', name: 'favorites', component: () => import('@/views/Favorites.vue') },
   { path: '/blog', name: 'blog', component: () => import('@/views/Blog.vue') },
   { path: '/news', name: 'news', component: () => import('@/views/News.vue') },
   { path: '/contacts', name: 'contacts', component: () => import('@/views/Contacts.vue') },

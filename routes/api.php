@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\TickerController;
 use App\Http\Controllers\Api\FeedbackController;
 
 Route::prefix('catalog')->group(function () {
+    Route::get('filters', [CatalogController::class, 'filters']);
     Route::get('categories', [CatalogController::class, 'categories']);
     Route::get('category/{id}', [CatalogController::class, 'category']);
     Route::get('product/{id}', [CatalogController::class, 'product']);

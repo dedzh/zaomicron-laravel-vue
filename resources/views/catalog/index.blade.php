@@ -1,4 +1,4 @@
-@extends('layouts.app') {{-- или ваш основной шаблон --}}
+@extends('layouts.app') 
 
 @section('content')
     <h1>Каталог продукции</h1>

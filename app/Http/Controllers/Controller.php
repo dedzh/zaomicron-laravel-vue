@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-abstract class Controller
-{
-    //
-}
+use App\Models\CatalogCategory;
+
+abstract class Controller {}
