@@ -1,21 +1,24 @@
 <?php
 
+use App\Http\Controllers\Api\CatalogController;
+use App\Http\Controllers\Api\FeedbackController;
+use App\Http\Controllers\Api\OrderController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\Api\CatalogController;
-use App\Http\Controllers\Api\SliderController;
-use App\Http\Controllers\Api\PromoController;
-use App\Http\Controllers\Api\TickerController;
-use App\Http\Controllers\Api\FeedbackController;
+Route::get('/catalog/filters', [CatalogController::class, 'filters']);
+Route::get('/catalog/categories', [CatalogController::class, 'categories']);
+Route::get('/catalog/category/{id}', [CatalogController::class, 'category']);
+Route::get('/catalog/product/{id}', [CatalogController::class, 'product']);
+Route::get('/catalog/featured', [CatalogController::class, 'featured']);
+Route::get('/catalog/search', [CatalogController::class, 'search']);
+Route::get('/main/promo', [CatalogController::class, 'mainPromo']);
 
-Route::prefix('catalog')->group(function () {
-    Route::get('filters', [CatalogController::class, 'filters']);
-    Route::get('categories', [CatalogController::class, 'categories']);
-    Route::get('category/{id}', [CatalogController::class, 'category']);
-    Route::get('product/{id}', [CatalogController::class, 'product']);
-    Route::get('search', [CatalogController::class, 'search']);
+Route::post('/order', [OrderController::class, 'store']);
+Route::post('/feedback', [FeedbackController::class, 'send']);
+Route::post('/partner', [FeedbackController::class, 'partner']);
+Route::post('/subscribe', [FeedbackController::class, 'subscribe']);
+
+// Временная заглушка для новостей
+Route::get('/news', function () {
+    return response()->json([]);
 });
-
-Route::post('feedback', [FeedbackController::class, 'send']);   // обратная связь
-Route::post('partner', [FeedbackController::class, 'partner']); // заявка партнёра
-Route::post('subscribe', [FeedbackController::class, 'subscribe']); // подписка

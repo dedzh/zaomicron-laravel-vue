@@ -4,7 +4,7 @@
       <h1>{{ category ? category.title : 'Каталог' }}</h1>
       <div class="sorting-options">
         <span>Сортировка:</span>
-        <select v-model="sortBy" @change="changeSort">
+        <select v-model="sortBy">
           <option value="popular">По популярности</option>
           <option value="price_asc">По цене (возрастание)</option>
           <option value="price_desc">По цене (убывание)</option>
@@ -15,7 +15,7 @@
     <div class="catalog-layout">
       <FiltersSidebar @apply="applyFilters" />
 
-      <div>
+      <div class="catalog-main">
         <div v-if="loading" class="loading-spinner">
           <i class="fas fa-spinner fa-pulse"></i> Загрузка...
         </div>
@@ -23,20 +23,26 @@
           <p>{{ error }}</p>
           <button class="btn btn-primary" @click="retryFetch">Повторить</button>
         </div>
-        <div v-else class="products-grid">
-          <ProductCard
-            v-for="product in paginatedProducts"
-            :key="product.id"
-            :id="product.id"
-            :name="product.name"
-            :sku="product.sku"
-            :price="product.price"
-            :image="product.image"
-            :is-favorite="product.isFavorite"
-            @add-to-cart="addToCart"
-            @toggle-favorite="toggleFavorite"
-          />
-        </div>
+        <template v-else>
+          <p v-if="!products.length && category && category.id !== 1" class="catalog-empty">
+            В этой категории пока нет позиций.
+          </p>
+         
+          <div class="products-grid">
+            <ProductCard
+              v-for="product in paginatedProducts"
+              :key="String(product.id)"
+              :id="product.id"
+              :name="product.name"
+              :sku="product.sku"
+              :price="product.price"
+              :image="product.image"
+              :is-favorite="product.isFavorite"
+              @add-to-cart="addToCart"
+              @toggle-favorite="toggleFavorite"
+            />
+          </div>
+        </template>
 
         <Pagination
           v-if="totalPages > 1"
@@ -67,23 +73,22 @@ export default {
       error: null,
       sortBy: 'popular',
       currentPage: 1,
-      itemsPerPage: 12,
+      serverLastPage: 1,
       filters: {
         minPrice: null,
         maxPrice: null,
         brands: [],
         types: []
       },
-      defaultImage: '/img/placeholder.jpg',
     };
   },
   computed: {
     filteredProducts() {
       let filtered = [...this.products];
-      if (this.filters.minPrice) {
+      if (this.filters.minPrice != null && this.filters.minPrice !== '') {
         filtered = filtered.filter(p => Number(p.price) >= Number(this.filters.minPrice));
       }
-      if (this.filters.maxPrice) {
+      if (this.filters.maxPrice != null && this.filters.maxPrice !== '') {
         filtered = filtered.filter(p => Number(p.price) <= Number(this.filters.maxPrice));
       }
       if (this.filters.brands && this.filters.brands.length) {
@@ -95,29 +100,27 @@ export default {
       return filtered;
     },
     sortedProducts() {
-      let sorted = [...this.filteredProducts];
-      if (this.sortBy === 'price_asc') {
-        sorted.sort((a, b) => a.price - b.price);
-      } else if (this.sortBy === 'price_desc') {
-        sorted.sort((a, b) => b.price - a.price);
-      }
-      return sorted;
+      return [...this.filteredProducts];
     },
     paginatedProducts() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.sortedProducts.slice(start, end);
+      return this.sortedProducts;
     },
     totalPages() {
-      return Math.ceil(this.sortedProducts.length / this.itemsPerPage);
+      return this.serverLastPage;
     },
   },
   watch: {
     '$route.params.id': {
       immediate: true,
       handler(id) {
+        this.currentPage = 1;
         this.fetchCategoryData(id || 1);
       },
+    },
+    sortBy() {
+      this.currentPage = 1;
+      const id = this.$route.params.id || 1;
+      this.fetchCategoryData(id);
     },
   },
   methods: {
@@ -125,21 +128,39 @@ export default {
       this.loading = true;
       this.error = null;
       try {
-        const response = await axios.get(`/api/catalog/category/${id}`);
+        const params = { page: this.currentPage };
+        if (this.sortBy === 'price_asc') {
+          params.sort = 'price_asc';
+        }
+        if (this.sortBy === 'price_desc') {
+          params.sort = 'price_desc';
+        }
+
+        const response = await axios.get(`/api/catalog/category/${id}`, { params });
         this.category = response.data.category || null;
         this.children = this.category?.children || [];
 
-        const itemsFromApi = response.data?.items?.data ?? response.data?.items ?? response.data?.products?.data ?? response.data?.products ?? [];
-        const rawProducts = Array.isArray(itemsFromApi) ? itemsFromApi : [];
+        const payload = response.data?.items ?? response.data?.products;
+        const rawProducts = Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload)
+            ? payload
+            : [];
+
+        this.serverLastPage = Math.max(1, Number(payload?.last_page) || 1);
+        if (payload?.current_page) {
+          this.currentPage = Number(payload.current_page);
+        }
 
         this.products = rawProducts.map(p => ({
           id: p.id ?? p.ID,
           name: p.name ?? p.NAME,
-          sku: p.sku ?? p.article ?? p.model ?? p.ID ?? '',
+          sku: p.sku ?? p.article ?? p.model ?? String(p.id ?? ''),
           price: Number(p.price ?? p.PRICE ?? 0),
           image: p.image ?? p.image_url ?? p.main_img ?? null,
           brand: p.brand ?? p.BRAND ?? '',
-          type: p.type ?? p.TYPE ?? ''
+          type: p.type ?? p.TYPE ?? '',
+          isFavorite: p.isFavorite ?? false,
         }));
       } catch (err) {
         console.error('Ошибка загрузки категории', err);
@@ -150,31 +171,26 @@ export default {
     },
     applyFilters(filters) {
       this.filters = filters;
-      this.currentPage = 1;
     },
     changePage(page) {
       this.currentPage = page;
+      const id = this.$route.params.id || 1;
+      this.fetchCategoryData(id);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    changeSort() {
-      this.currentPage = 1;
-    },
     addToCart(product) {
-      const cartStore = useCartStore();
-      cartStore.addToCart(product, 1);
+      useCartStore().addToCart(product, 1);
     },
     toggleFavorite(productId) {
       const product = this.products.find(p => p.id === productId);
       if (product) {
         product.isFavorite = !product.isFavorite;
-        // Здесь можно отправить запрос на сервер для сохранения избранного
       }
     },
     retryFetch() {
-      const id = this.$route.params.id || 1;
-      this.fetchCategoryData(id);
-    }
-  }
+      this.fetchCategoryData(this.$route.params.id || 1);
+    },
+  },
 };
 </script>
 
@@ -212,12 +228,26 @@ export default {
   display: grid;
   grid-template-columns: 250px 1fr;
   gap: 30px;
+  align-items: start;
+}
+.catalog-main {
+  min-width: 0;
+}
+.catalog-empty,
+.catalog-hint {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 14px;
 }
 .loading-spinner {
   text-align: center;
   padding: 50px;
   font-size: 18px;
-  color: #51AE45;
+  color: #51ae45;
 }
 .error-message {
   text-align: center;
@@ -238,9 +268,9 @@ export default {
 }
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: clamp(14px, 2vw, 22px);
+  margin-top: 12px;
 }
 @media (max-width: 1024px) {
   .catalog-layout {
@@ -256,7 +286,7 @@ export default {
     order: 2;
   }
   .products-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 480px) {

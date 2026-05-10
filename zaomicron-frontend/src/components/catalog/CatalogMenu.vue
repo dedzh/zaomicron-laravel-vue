@@ -12,7 +12,6 @@
             @click="goToCategory(cat.id)"
           >
             <div class="catalog-menu__item-content">
-              <img v-if="cat.icon" :src="cat.icon" class="catalog-menu__icon" alt="">
               <span>{{ cat.name }}</span>
               <i class="catalog-menu__arrow vi-icon-arrow-right" v-if="cat.children?.length"></i>
             </div>

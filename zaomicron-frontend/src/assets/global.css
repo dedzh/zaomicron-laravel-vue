@@ -110,3 +110,7 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+body.filters-drawer-open {
+  overflow: hidden;
+}

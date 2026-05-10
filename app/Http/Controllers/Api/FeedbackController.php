@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Feedback;
+
 use Illuminate\Http\Request;
 
 class FeedbackController extends Controller
@@ -16,8 +16,6 @@ class FeedbackController extends Controller
             'email' => 'required|email',
             'message' => 'nullable|string',
         ]);
-
-        Feedback::create($validated + ['type' => 'feedback']);
 
         return response()->json(['success' => true]);
     }
@@ -32,7 +30,6 @@ class FeedbackController extends Controller
             'comment' => 'nullable|string',
         ]);
 
-        Feedback::create($validated + ['type' => 'partner']);
 
         return response()->json(['success' => true]);
     }
@@ -41,7 +38,6 @@ class FeedbackController extends Controller
     {
         $validated = $request->validate(['email' => 'required|email']);
 
-        Feedback::create($validated + ['type' => 'subscribe']);
 
         return response()->json(['success' => true]);
     }

@@ -7,8 +7,7 @@
             <h3>Компания</h3>
             <ul class="footer-links">
               <li><a href="/about">О нас</a></li>
-              <li><a href="/history">История</a></li>
-              <li><a href="/certificates">Сертификаты</a></li>
+              <li><a href="/certificate">Сертификаты</a></li>
             </ul>
           </div>
           <div class="footer-column">
@@ -17,23 +16,25 @@
               <li v-for="cat in categories" :key="cat.id">
                 <router-link :to="'/catalog/' + cat.id">{{ cat.name }}</router-link>
               </li>
+              <li>
+                <a href="/catalogPDF">Каталоги PDF</a>
+              </li>
             </ul>
           </div>
           <div class="footer-column">
-            <h3>Услуги</h3>
+            <h3>Информация</h3>
             <ul class="footer-links">
-              <li><a href="/services#verification">Поверка</a></li>
-              <li><a href="/services#calibration">Калибровка</a></li>
-              <li><a href="/services#repair">Ремонт</a></li>
-              <li><a href="/services#consulting">Консультации</a></li>
+              <li><a href="/legalinfo">Правовая информация</a></li>
+              <li><a href="/privacy">Политика конфиденциальности</a></li>
+              <li><a href="/services">Услуги</a></li>
             </ul>
           </div>
           <div class="footer-column">
             <h3>Контакты</h3>
             <address>
-              <p>Москва, ул. Примерная, д. 1</p>
-              <p>Тел: <a href="tel:+74951234567">+7 (495) 123-45-67</a></p>
-              <p>Email: <a href="mailto:info@zaomicron.ru">info@zaomicron.ru</a></p>
+              <p>г. Москва, ул. Электродная, д. 2, стр. 12</p>
+              <p>Тел: <a href="tel:+74951234567">+7 (495) 104-72-41</a></p>
+              <p>Email: <a href="mailto:info@zaomicron.ru">micron@microntools.ru</a></p>
             </address>
           </div>
         </div>
@@ -44,7 +45,7 @@
         <p>© 2026 MICRON. Все права защищены.</p>
         <p>
           <a href="/privacy">Политика конфиденциальности</a> |
-          <a href="/agreement">Пользовательское соглашение</a>
+
         </p>
       </div>
     </div>

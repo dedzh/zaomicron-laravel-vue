@@ -1,178 +1,217 @@
 <template>
   <div class="services-page">
-    <div class="services-header">
-      <h1>Профессиональные услуги</h1>
-      <p>Полный комплекс метрологических услуг для промышленных предприятий. Поверка, калибровка, ремонт и техническое обслуживание контрольно-измерительных приборов.</p>
-    </div>
-
-    <div class="services-grid">
-      <div v-for="service in serviceCards" :key="service.id" class="service-card">
-        <div class="service-card-icon"><i :class="service.icon"></i></div>
-        <h3>{{ service.title }}</h3>
-        <p>{{ service.description }}</p>
-        <a :href="'#' + service.id" class="btn btn-primary" @click.prevent="goToTab(service.id)">Подробнее</a>
+    <div class="services-container">
+      <div class="services-header">
+        <h1>Профессиональные услуги</h1>
+        <p>Полный комплекс метрологических услуг для промышленных предприятий. Поверка, калибровка, ремонт и техническое обслуживание контрольно-измерительных приборов.</p>
       </div>
-    </div>
 
-    <div class="services-tabs">
-      <div
-        v-for="tab in tabs"
-        :key="tab.id"
-        class="service-tab"
-        :class="{ active: activeTab === tab.id }"
-        @click="activeTab = tab.id"
-      >
-        <span class="service-tab-icon"><i :class="tab.icon"></i></span> {{ tab.name }}
+      <div class="services-grid">
+        <div v-for="service in serviceCards" :key="service.id" class="service-card">
+          <div class="service-card-icon"><i :class="service.icon" aria-hidden="true"></i></div>
+          <h3>{{ service.title }}</h3>
+          <p>{{ service.description }}</p>
+          <a :href="'#' + service.id" class="btn btn-primary" @click.prevent="goToTab(service.id)" :aria-label="`Подробнее об услуге ${service.title}`">Подробнее</a>
+        </div>
       </div>
-    </div>
 
-    <div class="services-content">
-      <!-- Поверка -->
-      <div v-show="activeTab === 'verification'" class="service-content active">
-        <div class="service-detail">
-          <h2 class="service-title">
-            <span class="service-icon-large"><i class="fas fa-sync-alt"></i></span> Поверка контрольно-измерительных приборов
-          </h2>
-          <div class="service-description">
-            <p>Мы проводим официальную поверку всех типов контрольно-измерительных приборов в собственной аккредитованной лаборатории. Все работы выполняются в соответствии с требованиями ГОСТ и нормативных документов.</p>
-            <p>После успешной поверки вы получаете свидетельство о поверке установленного образца, которое подтверждает соответствие прибора метрологическим требованиям.</p>
-          </div>
-          <div class="service-features">
-            <div class="service-feature">
-              <h4>Аккредитованная лаборатория</h4>
-              <p>Лаборатория аккредитована в области обеспечения единства измерений</p>
+      <div class="services-tabs" role="tablist" aria-label="Услуги">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          class="service-tab"
+          :class="{ active: activeTab === tab.id }"
+          :id="`tab-${tab.id}`"
+          role="tab"
+          :aria-selected="activeTab === tab.id"
+          :aria-controls="`panel-${tab.id}`"
+          @click="activeTab = tab.id"
+        >
+          <span class="service-tab-icon" aria-hidden="true"><i :class="tab.icon"></i></span>
+          {{ tab.name }}
+        </button>
+      </div>
+
+      <div class="services-content">
+        <!-- Поверка -->
+        <div
+          v-show="activeTab === 'verification'"
+          class="service-content"
+          id="panel-verification"
+          role="tabpanel"
+          :aria-labelledby="`tab-verification`"
+        >
+          <div class="service-detail">
+            <h2 class="service-title">
+              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-sync-alt"></i></span> Поверка контрольно-измерительных приборов
+            </h2>
+            <div class="service-description">
+              <p>Мы проводим официальную поверку всех типов контрольно-измерительных приборов в собственной аккредитованной лаборатории. Все работы выполняются в соответствии с требованиями ГОСТ и нормативных документов.</p>
+              <p>После успешной поверки вы получаете свидетельство о поверке установленного образца, которое подтверждает соответствие прибора метрологическим требованиям.</p>
             </div>
-            <div class="service-feature">
-              <h4>Собственное эталонное оборудование</h4>
-              <p>Используем только сертифицированные эталоны высокого класса точности</p>
+            <div class="service-features">
+              <div class="service-feature">
+                <h4>Аккредитованная лаборатория</h4>
+                <p>Лаборатория аккредитована в области обеспечения единства измерений</p>
+              </div>
+              <div class="service-feature">
+                <h4>Собственное эталонное оборудование</h4>
+                <p>Используем только сертифицированные эталоны высокого класса точности</p>
+              </div>
+              <div class="service-feature">
+                <h4>Оперативность</h4>
+                <p>Средний срок выполнения поверки – 2 рабочих дня</p>
+              </div>
             </div>
-            <div class="service-feature">
-              <h4>Оперативность</h4>
-              <p>Средний срок выполнения поверки – 2 рабочих дня</p>
+            <div class="service-process">
+              <h3>Процесс поверки</h3>
+              <div class="process-steps">
+                <div v-for="step in processSteps" :key="step.number" class="process-step">
+                  <div class="process-step-number">{{ step.number }}</div>
+                  <h4>{{ step.title }}</h4>
+                  <p>{{ step.description }}</p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="service-process">
-            <h3>Процесс поверки</h3>
-            <div class="process-steps">
-              <div v-for="step in processSteps" :key="step.number" class="process-step">
-                <div class="process-step-number">{{ step.number }}</div>
-                <h4>{{ step.title }}</h4>
-                <p>{{ step.description }}</p>
+            <div class="service-pricing">
+              <h3>Стоимость услуг</h3>
+              <div class="pricing-table">
+                <table>
+                  <thead>
+                    <tr><th>Тип прибора</th><th>Срок</th><th>Стоимость</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="price in pricing" :key="price.type">
+                      <td>{{ price.type }}</td>
+                      <td>{{ price.term }}</td>
+                      <td class="price-amount">{{ price.price }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
-          <div class="service-pricing">
-            <h3>Стоимость услуг</h3>
-            <div class="pricing-table">
-              <table>
-                <thead>
-                  <tr><th>Тип прибора</th><th>Срок</th><th>Стоимость</th></tr>
-                </thead>
-                <tbody>
-                  <tr v-for="price in pricing" :key="price.type">
-                    <td>{{ price.type }}</td>
-                    <td>{{ price.term }}</td>
-                    <td class="price-amount">{{ price.price }}</td>
-                  </tr>
-                </tbody>
-              </table>
+        </div>
+
+        <!-- Калибровка -->
+        <div
+          v-show="activeTab === 'calibration'"
+          class="service-content"
+          id="panel-calibration"
+          role="tabpanel"
+          :aria-labelledby="`tab-calibration`"
+        >
+          <div class="service-detail">
+            <h2 class="service-title">
+              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-balance-scale"></i></span> Калибровка оборудования
+            </h2>
+            <div class="service-description">
+              <p>Калибровка средств измерений – важнейшая процедура для поддержания точности и надёжности вашего оборудования. Мы выполняем калибровку в собственной лаборатории или на территории заказчика.</p>
+              <p>По итогам работ выдаём протоколы калибровки, которые могут быть использованы для внутреннего контроля качества и требований ISO.</p>
+            </div>
+            <div class="service-features">
+              <div class="service-feature">
+                <h4>Выездная калибровка</h4>
+                <p>Калибруем оборудование на месте эксплуатации без остановки производства</p>
+              </div>
+              <div class="service-feature">
+                <h4>Международное признание</h4>
+                <p>Наши протоколы калибровки соответствуют требованиям ISO/IEC 17025</p>
+              </div>
+            </div>
+            <div class="service-pricing">
+              <h3>Стоимость калибровки</h3>
+              <div class="pricing-table">
+                <table>
+                  <thead>
+                    <tr><th>Тип прибора</th><th>Срок</th><th>Стоимость</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Манометры</td><td>1-2 дня</td><td class="price-amount">от 1 000 ₽</td></tr>
+                    <tr><td>Термометры</td><td>1-2 дня</td><td class="price-amount">от 1 200 ₽</td></tr>
+                    <tr><td>Расходомеры</td><td>2-3 дня</td><td class="price-amount">от 3 500 ₽</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ремонт -->
+        <div
+          v-show="activeTab === 'repair'"
+          class="service-content"
+          id="panel-repair"
+          role="tabpanel"
+          :aria-labelledby="`tab-repair`"
+        >
+          <div class="service-detail">
+            <h2 class="service-title">
+              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-wrench"></i></span> Ремонт оборудования
+            </h2>
+            <div class="service-description">
+              <p>Выполняем ремонт любых типов контрольно-измерительных приборов: манометров, термометров, расходомеров, анализаторов и другого оборудования. Восстанавливаем работоспособность, заменяем изношенные детали и проводим послеремонтную поверку.</p>
+              <p>На все работы предоставляем гарантию до 12 месяцев.</p>
+            </div>
+            <div class="service-features">
+              <div class="service-feature">
+                <h4>Склад запчастей</h4>
+                <p>Оригинальные комплектующие в наличии для большинства моделей</p>
+              </div>
+              <div class="service-feature">
+                <h4>Срочный ремонт</h4>
+                <p>Выполняем ремонт в течение 1–3 дней по согласованию</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Консультации -->
+        <div
+          v-show="activeTab === 'consulting'"
+          class="service-content"
+          id="panel-consulting"
+          role="tabpanel"
+          :aria-labelledby="`tab-consulting`"
+        >
+          <div class="service-detail">
+            <h2 class="service-title">
+              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-lightbulb"></i></span> Инженерные консультации
+            </h2>
+            <div class="service-description">
+              <p>Наши инженеры помогают подобрать оптимальное оборудование, разработать методики измерений, провести анализ погрешностей и оптимизировать процессы контроля качества.</p>
+              <p>Консультации проводятся как в офисе компании, так и выездом на производственную площадку заказчика.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Монтаж -->
+        <div
+          v-show="activeTab === 'installation'"
+          class="service-content"
+          id="panel-installation"
+          role="tabpanel"
+          :aria-labelledby="`tab-installation`"
+        >
+          <div class="service-detail">
+            <h2 class="service-title">
+              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-plug"></i></span> Монтаж и пусконаладка
+            </h2>
+            <div class="service-description">
+              <p>Профессиональный монтаж контрольно-измерительных приборов, подключение к системам автоматизации, настройка параметров и пусконаладка оборудования.</p>
+              <p>Работы выполняются сертифицированными специалистами с соблюдением всех технических регламентов.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Калибровка -->
-      <div v-show="activeTab === 'calibration'" class="service-content">
-        <div class="service-detail">
-          <h2 class="service-title">
-            <span class="service-icon-large"><i class="fas fa-balance-scale"></i></span> Калибровка оборудования
-          </h2>
-          <div class="service-description">
-            <p>Калибровка средств измерений – важнейшая процедура для поддержания точности и надёжности вашего оборудования. Мы выполняем калибровку в собственной лаборатории или на территории заказчика.</p>
-            <p>По итогам работ выдаём протоколы калибровки, которые могут быть использованы для внутреннего контроля качества и требований ISO.</p>
+      <div class="certificates-section">
+        <h2 style="text-align: center; margin-bottom: 30px;">Наши сертификаты и допуски</h2>
+        <div class="certificates-grid">
+          <div v-for="cert in certificates" :key="cert.title" class="certificate-item">
+            <div class="certificate-icon" aria-hidden="true"><i :class="cert.icon"></i></div>
+            <h4>{{ cert.title }}</h4>
           </div>
-          <div class="service-features">
-            <div class="service-feature">
-              <h4>Выездная калибровка</h4>
-              <p>Калибруем оборудование на месте эксплуатации без остановки производства</p>
-            </div>
-            <div class="service-feature">
-              <h4>Международное признание</h4>
-              <p>Наши протоколы калибровки соответствуют требованиям ISO/IEC 17025</p>
-            </div>
-          </div>
-          <div class="service-pricing">
-            <h3>Стоимость калибровки</h3>
-            <div class="pricing-table">
-              <table>
-                <thead><tr><th>Тип прибора</th><th>Срок</th><th>Стоимость</th></tr></thead>
-                <tbody>
-                  <tr><td>Манометры</td><td>1-2 дня</td><td class="price-amount">от 1 000 ₽</td></tr>
-                  <tr><td>Термометры</td><td>1-2 дня</td><td class="price-amount">от 1 200 ₽</td></tr>
-                  <tr><td>Расходомеры</td><td>2-3 дня</td><td class="price-amount">от 3 500 ₽</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Ремонт -->
-      <div v-show="activeTab === 'repair'" class="service-content">
-        <div class="service-detail">
-          <h2 class="service-title">
-            <span class="service-icon-large"><i class="fas fa-wrench"></i></span> Ремонт оборудования
-          </h2>
-          <div class="service-description">
-            <p>Выполняем ремонт любых типов контрольно-измерительных приборов: манометров, термометров, расходомеров, анализаторов и другого оборудования. Восстанавливаем работоспособность, заменяем изношенные детали и проводим послеремонтную поверку.</p>
-            <p>На все работы предоставляем гарантию до 12 месяцев.</p>
-          </div>
-          <div class="service-features">
-            <div class="service-feature">
-              <h4>Склад запчастей</h4>
-              <p>Оригинальные комплектующие в наличии для большинства моделей</p>
-            </div>
-            <div class="service-feature">
-              <h4>Срочный ремонт</h4>
-              <p>Выполняем ремонт в течение 1–3 дней по согласованию</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Консультации -->
-      <div v-show="activeTab === 'consulting'" class="service-content">
-        <div class="service-detail">
-          <h2 class="service-title">
-            <span class="service-icon-large"><i class="fas fa-lightbulb"></i></span> Инженерные консультации
-          </h2>
-          <div class="service-description">
-            <p>Наши инженеры помогают подобрать оптимальное оборудование, разработать методики измерений, провести анализ погрешностей и оптимизировать процессы контроля качества.</p>
-            <p>Консультации проводятся как в офисе компании, так и выездом на производственную площадку заказчика.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Монтаж -->
-      <div v-show="activeTab === 'installation'" class="service-content">
-        <div class="service-detail">
-          <h2 class="service-title">
-            <span class="service-icon-large"><i class="fas fa-plug"></i></span> Монтаж и пусконаладка
-          </h2>
-          <div class="service-description">
-            <p>Профессиональный монтаж контрольно-измерительных приборов, подключение к системам автоматизации, настройка параметров и пусконаладка оборудования.</p>
-            <p>Работы выполняются сертифицированными специалистами с соблюдением всех технических регламентов.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="certificates-section">
-      <h2 style="text-align: center; margin-bottom: 30px;">Наши сертификаты и допуски</h2>
-      <div class="certificates-grid">
-        <div v-for="cert in certificates" :key="cert.title" class="certificate-item">
-          <div class="certificate-icon"><i :class="cert.icon"></i></div>
-          <h4>{{ cert.title }}</h4>
         </div>
       </div>
     </div>
@@ -190,13 +229,7 @@ export default {
         { id: 'calibration', icon: 'fas fa-balance-scale', title: 'Калибровка', description: 'Калибровка оборудования в собственной лаборатории с применением эталонных средств измерений.' },
         { id: 'repair', icon: 'fas fa-wrench', title: 'Ремонт оборудования', description: 'Качественный ремонт любых контрольно-измерительных приборов с гарантией на выполненные работы.' }
       ],
-      tabs: [
-        { id: 'verification', icon: 'fas fa-sync-alt', name: 'Поверка' },
-        { id: 'calibration', icon: 'fas fa-balance-scale', name: 'Калибровка' },
-        { id: 'repair', icon: 'fas fa-wrench', name: 'Ремонт' },
-        { id: 'consulting', icon: 'fas fa-lightbulb', name: 'Консультации' },
-        { id: 'installation', icon: 'fas fa-plug', name: 'Монтаж' }
-      ],
+
       processSteps: [
         { number: 1, title: 'Заявка', description: 'Вы оставляете заявку на сайте или по телефону' },
         { number: 2, title: 'Доставка', description: 'Передаете приборы нам курьером или привозите сами' },
@@ -221,16 +254,31 @@ export default {
   methods: {
     goToTab(tabId) {
       this.activeTab = tabId;
-      // плавный скролл (закомментировано до подключения БД)
-      // const element = document.getElementById(tabId);
-      // if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Плавный скролл к вкладке (опционально)
+      const tabElement = document.getElementById(`tab-${tabId}`);
+      if (tabElement) {
+        tabElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     }
   }
 };
 </script>
 
 <style scoped>
-/* Стили, скопированные из предоставленного CSS, адаптированные под данный компонент */
+/* Усиленные fallback для CSS-переменных */
+.services-page {
+  --color-border: #e0e0e0;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+  --color-text-light: #666;
+}
+
+.services-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
 .services-page {
   padding: 40px 0;
 }
@@ -264,7 +312,7 @@ export default {
 
 .service-card {
   background: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 30px;
   text-align: center;
@@ -274,7 +322,7 @@ export default {
 
 .service-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-md);
   border-color: #51AE45;
 }
 
@@ -291,7 +339,7 @@ export default {
 }
 
 .service-card p {
-  color: #666;
+  color: var(--color-text-light);
   font-size: 14px;
   line-height: 1.6;
   margin-bottom: 20px;
@@ -306,7 +354,7 @@ export default {
   justify-content: center;
   gap: 10px;
   margin-bottom: 40px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border);
   padding-bottom: 10px;
   flex-wrap: wrap;
 }
@@ -314,15 +362,16 @@ export default {
 .service-tab {
   padding: 12px 25px;
   background: #f5f7fa;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
+  font-family: inherit;
 }
 
 .service-tab.active,
@@ -336,23 +385,28 @@ export default {
   font-size: 18px;
 }
 
-.service-content {
-  display: none;
-  animation: fadeIn 0.5s ease;
+.services-content {
+  position: relative;
 }
 
-.service-content.active {
-  display: block;
+.service-content {
+  animation: fadeIn 0.3s ease;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .service-detail {
   background: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 40px;
   margin-bottom: 40px;
@@ -373,7 +427,7 @@ export default {
 }
 
 .service-description {
-  color: #666;
+  color: var(--color-text-light);
   line-height: 1.7;
   margin-bottom: 30px;
   font-size: 16px;
@@ -400,7 +454,7 @@ export default {
 }
 
 .service-feature p {
-  color: #666;
+  color: var(--color-text-light);
   font-size: 14px;
   line-height: 1.5;
 }
@@ -421,7 +475,7 @@ export default {
   text-align: center;
   padding: 20px;
   background: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   position: relative;
 }
@@ -445,7 +499,7 @@ export default {
 }
 
 .process-step p {
-  color: #666;
+  color: var(--color-text-light);
   font-size: 14px;
 }
 
@@ -479,7 +533,7 @@ export default {
 
 .pricing-table td {
   padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .pricing-table tr:hover {
@@ -495,7 +549,7 @@ export default {
 .certificates-section {
   margin-top: 60px;
   padding-top: 40px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--color-border);
 }
 
 .certificates-grid {
@@ -507,7 +561,7 @@ export default {
 
 .certificate-item {
   background: white;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 20px;
   text-align: center;
@@ -516,7 +570,7 @@ export default {
 
 .certificate-item:hover {
   border-color: #51AE45;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .certificate-icon {

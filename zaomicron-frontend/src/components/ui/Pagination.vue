@@ -1,14 +1,37 @@
 <template>
-  <nav class="pagination">
-    <a
-      v-for="page in pages"
-      :key="page"
+  <nav class="pagination" aria-label="Пагинация">
+    <button
       class="pagination-item"
-      :class="{ active: page === currentPage }"
-      href="#"
-      @click.prevent="$emit('page-changed', page)"
-    >{{ page }}</a>
-    <a href="#" class="pagination-item" @click.prevent="$emit('page-changed', currentPage + 1)">→</a>
+      :disabled="currentPage === 1"
+      :aria-disabled="currentPage === 1"
+      @click="changePage(currentPage - 1)"
+      aria-label="Предыдущая страница"
+    >
+      ←
+    </button>
+
+    <template v-for="page in visiblePages" :key="page">
+      <button
+        v-if="page !== '...'"
+        class="pagination-item"
+        :class="{ active: page === currentPage }"
+        :aria-current="page === currentPage ? 'page' : undefined"
+        @click="changePage(page)"
+      >
+        {{ page }}
+      </button>
+      <span v-else class="pagination-ellipsis">…</span>
+    </template>
+
+    <button
+      class="pagination-item"
+      :disabled="currentPage === totalPages"
+      :aria-disabled="currentPage === totalPages"
+      @click="changePage(currentPage + 1)"
+      aria-label="Следующая страница"
+    >
+      →
+    </button>
   </nav>
 </template>
 
@@ -16,45 +39,106 @@
 export default {
   name: 'Pagination',
   props: {
-    currentPage: Number,
-    totalPages: Number
+    currentPage: {
+      type: Number,
+      required: true,
+    },
+    totalPages: {
+      type: Number,
+      required: true,
+    },
   },
   computed: {
-    pages() {
-      const pages = [];
-      for (let i = 1; i <= this.totalPages; i++) {
-        pages.push(i);
+    visiblePages() {
+      const total = this.totalPages;
+      const current = this.currentPage;
+      const delta = 2; // сколько страниц показывать слева и справа от текущей
+      const range = [];
+      const rangeWithDots = [];
+
+      for (let i = 1; i <= total; i++) {
+        if (
+          i === 1 ||
+          i === total ||
+          (i >= current - delta && i <= current + delta)
+        ) {
+          range.push(i);
+        }
       }
-      return pages;
-    }
-  }
+
+      let last;
+      for (const i of range) {
+        if (last) {
+          if (i - last === 2) {
+            rangeWithDots.push(last + 1);
+          } else if (i - last !== 1) {
+            rangeWithDots.push('...');
+          }
+        }
+        rangeWithDots.push(i);
+        last = i;
+      }
+      return rangeWithDots;
+    },
+  },
+  methods: {
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.$emit('page-changed', page);
+      }
+    },
+  },
 };
 </script>
+
 <style scoped>
 .pagination {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 8px;
   margin-top: 30px;
+  flex-wrap: wrap;
 }
+
 .pagination-item {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
+  min-width: 40px;
   height: 40px;
-  border: 1px solid #e0e0e0;
+  padding: 0 8px;
+  border: 1px solid var(--color-border, #e0e0e0);
   border-radius: 4px;
-  text-decoration: none;
+  background: #fff;
   color: #333;
+  font-size: 14px;
+  cursor: pointer;
   transition: all 0.2s;
 }
+
 .pagination-item.active {
-  background: #51AE45;
-  border-color: #51AE45;
+  background: #51ae45;
+  border-color: #51ae45;
   color: white;
+  cursor: default;
 }
-.pagination-item:hover:not(.active) {
+
+.pagination-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-item:not(:disabled):not(.active):hover {
   background: #f5f7fa;
+}
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  color: #666;
 }
 </style>

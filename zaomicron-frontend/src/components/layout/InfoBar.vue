@@ -3,8 +3,6 @@
     <div class="container">
       <div class="header-info-content">
         <ul class="header-info-links">
-          <li><a href="#delivery">Доставка</a></li>
-
           <li><a href="#warranty">Гарантия</a></li>
           <li><a href="/contacts">Контакты</a></li>
           <li><a href="/partners">Партнерам</a></li>

@@ -54,8 +54,8 @@ export default {
     },
     async fetchFeaturedProducts() {
       try {
-        const { data } = await axios.get('/api/catalog/category/1'); // предположим, корневая категория
-        this.featuredProducts = data.items.data.slice(0, 12);
+        const { data } = await axios.get('/api/catalog/featured?limit=9');
+        this.featuredProducts = Array.isArray(data) ? data : [];
       } catch (e) { console.error(e); }
     }
   }

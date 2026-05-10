@@ -5,6 +5,9 @@
 
         <!--пункты меню  -->
         <li class="nav-item">
+          <router-link to="/about" class="nav-link" exact-active-class="active">О кампании</router-link>
+        </li>
+        <li class="nav-item">
           <router-link to="/catalog" class="nav-link" exact-active-class="active">Каталог</router-link>
         </li>
         <li class="nav-item">
@@ -12,9 +15,6 @@
         </li>
         <li class="nav-item">
           <router-link to="/blog" class="nav-link" exact-active-class="active">Блог</router-link>
-        </li>
-        <li class="nav-item">
-          <router-link to="/news" class="nav-link" exact-active-class="active">Новости</router-link>
         </li>
         <li class="nav-item">
           <router-link to="/partners" class="nav-link" exact-active-class="active">Партнерам</router-link>

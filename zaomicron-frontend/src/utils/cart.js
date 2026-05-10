@@ -1,73 +1,38 @@
-const STORAGE_KEY = 'zaomicron_cart_v1';
+import { getActivePinia } from 'pinia';
+import { useCartStore } from '@/stores/cart';
 
-function normalizeId(id) {
-  return id == null ? '' : String(id);
-}
-
-export function loadCart() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-}
-
-export function saveCart(cart) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
-}
-
-export function getCartItems() {
-  return loadCart();
+function store() {
+    if (!getActivePinia()) {
+        return null;
+    }
+    return useCartStore();
 }
 
 export function addToCart(product, quantity = 1) {
-  const id = normalizeId(product?.id);
-  if (!id) return;
-
-  const cart = loadCart();
-  const emoji = product?.emoji ?? '🛒';
-
-  const index = cart.findIndex(x => normalizeId(x.id) === id);
-  if (index >= 0) {
-    cart[index].quantity = Math.max(1, Number(cart[index].quantity || 1) + Number(quantity || 1));
-    cart[index].name = product?.name ?? cart[index].name;
-    cart[index].sku = product?.sku ?? cart[index].sku;
-    cart[index].price = product?.price ?? cart[index].price;
-    cart[index].emoji = emoji;
-  } else {
-    cart.push({
-      id,
-      name: product?.name ?? '',
-      sku: product?.sku ?? '',
-      price: Number(product?.price ?? 0),
-      quantity: Math.max(1, Number(quantity || 1)),
-      emoji
-    });
-  }
-
-  saveCart(cart);
+    const s = store();
+    if (s) {
+        s.addToCart(product, quantity);
+    }
 }
 
 export function updateQuantity(id, delta) {
-  const cart = loadCart();
-  const key = normalizeId(id);
-  const index = cart.findIndex(x => normalizeId(x.id) === key);
-  if (index < 0) return;
-
-  cart[index].quantity = Math.max(1, Number(cart[index].quantity || 1) + Number(delta || 0));
-  saveCart(cart);
+    const s = store();
+    if (!s) {
+        return;
+    }
+    const key = id == null ? '' : String(id);
+    const item = s.items.find((x) => String(x.id) === key);
+    if (!item) {
+        return;
+    }
+    const next = Math.max(1, Number(item.quantity || 1) + Number(delta || 0));
+    s.updateQuantity(item.id, next);
 }
 
 export function removeFromCart(id) {
-  const cart = loadCart();
-  const key = normalizeId(id);
-  const next = cart.filter(x => normalizeId(x.id) !== key);
-  saveCart(next);
+    store()?.removeFromCart(id);
 }
 
 export function clearCart() {
-  saveCart([]);
+    store()?.clearCart();
 }
-
