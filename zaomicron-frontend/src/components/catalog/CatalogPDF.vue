@@ -19,7 +19,13 @@
           <div class="catalog-card-body">
             <h3 class="catalog-card-title">{{ item.title }}</h3>
             <p class="catalog-card-desc">{{ item.description }}</p>
-            <a :href="item.pdfUrl" class="btn-download" target="_blank" rel="noopener noreferrer">
+            <a
+              :href="item.pdfUrl"
+              class="btn-download"
+              target="_blank"
+              rel="noopener noreferrer"
+              download
+            >
               <i class="fas fa-file-pdf" aria-hidden="true"></i>
               Скачать PDF
             </a>
@@ -31,6 +37,13 @@
 </template>
 
 <script>
+// Импорт PDF-файлов
+import catIzmerPdf from '@/assets/files/cat_izmer.pdf'
+import catalogMicronPdf from '@/assets/files/catalog_micron.pdf'
+import coverMicron from '@/assets/files/cat_izmer_pic.png'
+import coverCatalog from '@/assets/files/cat_micron.png'
+
+
 export default {
   name: 'CatalogPDF',
   data() {
@@ -40,30 +53,30 @@ export default {
           id: 1,
           title: 'Каталог Micron',
           description: 'Полный каталог измерительного инструмента, калибров, слесарного и металлорежущего инструмента.',
-          pdfUrl: '@/src/assets/files/cat_izmer.pdf?v=3',
-          coverImage: '/uploads/catalog/img/micron.jpg'
+          pdfUrl: catIzmerPdf,
+          coverImage: coverMicron
         },
         {
           id: 2,
           title: 'Общий каталог инструмента',
           description: 'Широкий ассортимент: от штангенциркулей до микрометров, индикаторов и нутромеров.',
-          pdfUrl: '@/src/assets/files/catalog_micron.pdf?v=3',
-          coverImage: '/uploads/catalog/img/catalog.jpg'
+          pdfUrl: catalogMicronPdf,
+          coverImage: coverCatalog
         },
-        {
+       /* {
           id: 3,
           title: 'Каталог Guanglu',
           description: 'Электроизмерительные приборы, мультиметры, токоизмерительные клещи и тестеры.',
-          pdfUrl: '@/src/assets/files/cat_izmer.pdf?v=3',
-          coverImage: '/uploads/catalog/img/guanglu.jpg'
+          pdfUrl: catalogGuangluPdf,  // замени переменную, если файл отличается
+          coverImage: coverGuanglu
         },
         {
           id: 4,
           title: 'Каталог цен',
           description: 'Электроизмерительные приборы, мультиметры, токоизмерительные клещи и тестеры.',
-          pdfUrl: '@/src/assets/files/cat_izmer.pdf?v=3',
-          coverImage: '/uploads/catalog/img/guanglu.jpg'
-        }
+          pdfUrl: catalogGuangluPdf,  // или другой файл
+          coverImage: coverGuanglu
+        }*/
       ]
     };
   }

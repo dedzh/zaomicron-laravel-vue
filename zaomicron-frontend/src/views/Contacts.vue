@@ -120,12 +120,13 @@ export default {
         {
           iconClass: 'fas fa-phone-alt',
           label: 'Телефоны',
-          value: '+7 (495) 104-72-41'
+          value: '	+7 (495) 775-24-75 многоканальный <br>+7 (800) 505-21-87 (звонок по России бесплатный пн. - пт.: 9:00 – 17.30)'
+
         },
         {
           iconClass: 'fas fa-envelope',
           label: 'Email',
-          value: 'micron@microntools.ru<br>sale03@microntools.ru'
+          value: 'micron@microntools.ru'
         },
         {
           iconClass: 'fas fa-clock',
@@ -150,7 +151,7 @@ export default {
       this.isLoading = true;
 
       try {
-        // Имитация отправки — замените URL на реальный эндпоинт
+      
         await axios.post('/api/feedback', this.form);
         this.formMessage = 'Сообщение успешно отправлено!';
         this.formMessageType = 'success';
@@ -163,7 +164,7 @@ export default {
         this.isLoading = false;
         setTimeout(() => {
           this.formMessage = '';
-        }, 5000);
+      },7000);
       }
     }
   }

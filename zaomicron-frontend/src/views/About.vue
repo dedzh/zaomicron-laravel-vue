@@ -11,12 +11,12 @@
       <div class="about-content">
         <div class="about-description">
           <p>
-            Компания «ZAOMICRON» объединяет 3 производства и осуществляет поставки инструмента, приборов, станочной оснастки
+            Компания «MICRON» объединяет 3 производства и осуществляет поставки инструмента, приборов, станочной оснастки
             для обеспечения бесперебойной работы фабрик и заводов в России.
             Наша компания растет и развивается: производимый заводами измерительный инструмент внесен в Госреестр средств
             измерений РФ, вся поставляемая продукция соответствует высоким российским (ГОСТ, ТУ) и мировым стандартам.
           </p>
-          <p><strong>Специализацией компании «ZAOMICRON» является следующая продукция:</strong></p>
+          <p><strong>Специализацией компании «MICRON» является следующая продукция:</strong></p>
           <ul class="products-list">
             <li><i class="fas fa-ruler" aria-hidden="true"></i> <strong>Измерительный инструмент:</strong> штангенциркули, микрометры, глубиномеры, нутромеры, нормалемеры и меры длины</li>
             <li><i class="fas fa-circle-notch" aria-hidden="true"></i> <strong>Калибры</strong> общепромышленного и нефтяного сортамента</li>
@@ -51,20 +51,6 @@
             <div class="stat-number">35</div>
             <div class="stat-label">товарных категорий</div>
           </div>
-        </div>
-      </div>
-
-      <div class="about-video">
-        <h2>Фото о компании</h2>
-        <div class="video-wrapper">
-          <iframe
-            src=""
-            title="Видео о компании ZAOMICRON"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            loading="lazy"
-          ></iframe>
         </div>
       </div>
     </div>

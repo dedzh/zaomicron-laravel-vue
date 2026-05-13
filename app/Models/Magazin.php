@@ -9,7 +9,7 @@ class Magazin extends Model
     protected $table = 'magazin';
     protected $primaryKey = 'code';
     public $timestamps = false;
-    public $incrementing = false;   // поле code не автоинкрементное
+    public $incrementing = false;
     protected $keyType = 'int';
 
     protected $fillable = [
@@ -17,20 +17,21 @@ class Magazin extends Model
         'sale', 'product', 'nom_weight', 'brand'
     ];
 
-    // Связь с категорией (mikronproduction.id)
-    public function category()
-    {
-        return $this->belongsTo(MikronProduction::class, 'parent', 'id');
-    }
-
-    // Активные товары – убираем жёсткие условия, оставляем только проверку на deleted (если есть)
-    // В вашей таблице нет поля deleted, поэтому пока оставляем пустым
+    /**
+     * Связь с категорией (mikronproduction.id = magazin.parent)
+     */
+public function category()
+{
+    return $this->belongsTo(MikronProduction::class, 'parent', 'id');
+}
     public function scopeActive($query)
     {
         return $query;
     }
 
-    // Остаток на складе
+    /**
+     * Остаток на складе
+     */
     public function getStockAttribute()
     {
         return max(0, (int) $this->col1) + max(0, (int) $this->col2);

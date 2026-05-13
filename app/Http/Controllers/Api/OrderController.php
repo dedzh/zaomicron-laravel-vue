@@ -1,10 +1,7 @@
 <?php
+namespace App\Http\Controllers;
 
-namespace App\Http\Controllers\Api;
-
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -12,20 +9,21 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:64',
-            'email' => 'required|email',
-            'comment' => 'nullable|string|max:2000',
+            'phone' => 'required|string|max:50',
+            'email' => 'required|email|max:255',
+            'comment' => 'nullable|string|max:1000',
             'items' => 'required|array|min:1',
             'items.*.id' => 'required',
-            'items.*.name' => 'required|string|max:500',
-            'items.*.sku' => 'nullable|string|max:128',
+            'items.*.name' => 'required|string',
+            'items.*.price' => 'required|numeric',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0',
-            'total' => 'required|numeric|min:0',
+            'total' => 'required|numeric',
         ]);
 
-        Log::info('order', $validated);
+        // Здесь сохраняете заказ в БД (например, в таблицу orders)
+        // Либо отправляете уведомление на почту
 
+        // Пока просто возвращаем успех
         return response()->json(['success' => true]);
     }
 }

@@ -1,9 +1,15 @@
 <template>
-  <div>
-    <HeroSlider :slides="slides" />
-    <PromoGrid :items="promoItems" />
-    <Marquee :items="tickerItems" />
-    <ProductGrid :products="featuredProducts" />
+  <div class="home-page animated-fade">
+    <HeroSlider />
+    <section class="home-section animated-rise">
+      <PromoGrid />
+    </section>
+    <section class="home-section animated-rise" style="animation-delay: 80ms">
+      <Marquee />
+    </section>
+    <section class="home-section animated-rise" style="animation-delay: 140ms">
+      <ProductGrid :products="featuredProducts" />
+    </section>
   </div>
 </template>
 
@@ -15,49 +21,33 @@ import Marquee from '@/components/home/Marquee.vue';
 import ProductGrid from '@/components/home/ProductGrid.vue';
 
 export default {
-    name: 'Home',
+  name: 'Home',
   components: { HeroSlider, PromoGrid, Marquee, ProductGrid },
   data() {
-    return {
-      slides: [],
-      promoItems: [],
-      tickerItems: [],
-      featuredProducts: []
-    };
+    return { featuredProducts: [] };
   },
   async created() {
-    await Promise.all([
-      this.fetchSlides(),
-      this.fetchPromo(),
-      this.fetchTicker(),
-      this.fetchFeaturedProducts()
-    ]);
+    await this.fetchFeaturedProducts();
   },
   methods: {
-    async fetchSlides() {
-      try {
-        const { data } = await axios.get('/api/slider');
-        this.slides = data;
-      } catch (e) { console.error(e); }
-    },
-    async fetchPromo() {
-      try {
-        const { data } = await axios.get('/api/promo');
-        this.promoItems = data;
-      } catch (e) { console.error(e); }
-    },
-    async fetchTicker() {
-      try {
-        const { data } = await axios.get('/api/ticker');
-        this.tickerItems = data;
-      } catch (e) { console.error(e); }
-    },
     async fetchFeaturedProducts() {
       try {
         const { data } = await axios.get('/api/catalog/featured?limit=9');
         this.featuredProducts = Array.isArray(data) ? data : [];
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 };
 </script>
+
+<style scoped>
+.home-page {
+  padding-bottom: 28px;
+}
+
+.home-section {
+  margin-top: 8px;
+}
+</style>

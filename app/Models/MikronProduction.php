@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MikronProduction extends Model
 {
@@ -17,6 +18,9 @@ class MikronProduction extends Model
         'buttonpaddn', 'buttonpadds', 'tops',
     ];
 
+    /**
+     * Дочерние категории
+     */
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent', 'id')
@@ -25,11 +29,17 @@ class MikronProduction extends Model
             ->orderBy('title');
     }
 
-    public function parentRow(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    /**
+     * Родительская категория
+     */
+    public function parentRow(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent', 'id');
     }
 
+    /**
+     * Только активные (не удалённые)
+     */
     public function scopeActive($query)
     {
         return $query->where('deleted', 0);

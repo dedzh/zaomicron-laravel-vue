@@ -1,621 +1,423 @@
 <template>
   <div class="services-page">
     <div class="services-container">
+      <!-- Hero-заголовок -->
       <div class="services-header">
-        <h1>Профессиональные услуги</h1>
-        <p>Полный комплекс метрологических услуг для промышленных предприятий. Поверка, калибровка, ремонт и техническое обслуживание контрольно-измерительных приборов.</p>
+        <h1 class="services-header__title">Поверка и калибровка средств измерений</h1>
+        <p class="services-header__lead">
+          Полный комплекс метрологических услуг для промышленных предприятий.
+          Работаем с линейно-угловыми, механическими, теплотехническими и физико-химическими измерениями.
+        </p>
+        <router-link to="/contacts" class="btn btn-primary btn-large">
+          <i class="fas fa-envelope"></i> Оставить заявку
+        </router-link>
       </div>
 
+      <!-- Карточки основных групп услуг -->
       <div class="services-grid">
-        <div v-for="service in serviceCards" :key="service.id" class="service-card">
-          <div class="service-card-icon"><i :class="service.icon" aria-hidden="true"></i></div>
-          <h3>{{ service.title }}</h3>
-          <p>{{ service.description }}</p>
-          <a :href="'#' + service.id" class="btn btn-primary" @click.prevent="goToTab(service.id)" :aria-label="`Подробнее об услуге ${service.title}`">Подробнее</a>
+        <div v-for="svc in mainServices" :key="svc.id" class="service-card">
+          <div class="service-card__icon"><i :class="svc.icon" /></div>
+          <h3 class="service-card__title">{{ svc.title }}</h3>
+          <p class="service-card__desc">{{ svc.description }}</p>
+          <a :href="'#category-' + svc.id" class="btn btn-outline" @click.prevent="scrollToCategory(svc.id)">Подробнее</a>
         </div>
       </div>
 
-      <div class="services-tabs" role="tablist" aria-label="Услуги">
-        <button
-          v-for="tab in tabs"
-          :key="tab.id"
-          class="service-tab"
-          :class="{ active: activeTab === tab.id }"
-          :id="`tab-${tab.id}`"
-          role="tab"
-          :aria-selected="activeTab === tab.id"
-          :aria-controls="`panel-${tab.id}`"
-          @click="activeTab = tab.id"
-        >
-          <span class="service-tab-icon" aria-hidden="true"><i :class="tab.icon"></i></span>
-          {{ tab.name }}
-        </button>
-      </div>
-
-      <div class="services-content">
-        <!-- Поверка -->
-        <div
-          v-show="activeTab === 'verification'"
-          class="service-content"
-          id="panel-verification"
-          role="tabpanel"
-          :aria-labelledby="`tab-verification`"
-        >
-          <div class="service-detail">
-            <h2 class="service-title">
-              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-sync-alt"></i></span> Поверка контрольно-измерительных приборов
-            </h2>
-            <div class="service-description">
-              <p>Мы проводим официальную поверку всех типов контрольно-измерительных приборов в собственной аккредитованной лаборатории. Все работы выполняются в соответствии с требованиями ГОСТ и нормативных документов.</p>
-              <p>После успешной поверки вы получаете свидетельство о поверке установленного образца, которое подтверждает соответствие прибора метрологическим требованиям.</p>
-            </div>
-            <div class="service-features">
-              <div class="service-feature">
-                <h4>Аккредитованная лаборатория</h4>
-                <p>Лаборатория аккредитована в области обеспечения единства измерений</p>
-              </div>
-              <div class="service-feature">
-                <h4>Собственное эталонное оборудование</h4>
-                <p>Используем только сертифицированные эталоны высокого класса точности</p>
-              </div>
-              <div class="service-feature">
-                <h4>Оперативность</h4>
-                <p>Средний срок выполнения поверки – 2 рабочих дня</p>
-              </div>
-            </div>
-            <div class="service-process">
-              <h3>Процесс поверки</h3>
-              <div class="process-steps">
-                <div v-for="step in processSteps" :key="step.number" class="process-step">
-                  <div class="process-step-number">{{ step.number }}</div>
-                  <h4>{{ step.title }}</h4>
-                  <p>{{ step.description }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="service-pricing">
-              <h3>Стоимость услуг</h3>
-              <div class="pricing-table">
-                <table>
-                  <thead>
-                    <tr><th>Тип прибора</th><th>Срок</th><th>Стоимость</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="price in pricing" :key="price.type">
-                      <td>{{ price.type }}</td>
-                      <td>{{ price.term }}</td>
-                      <td class="price-amount">{{ price.price }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+      <!-- Блок о партнёре и преимуществах -->
+      <div class="partner-block">
+        <div class="partner-block__image">
+          <img src="@/assets/logo-rmc-kalibron.png" alt="РМЦ Калиброн" @error="imgFallback($event)" />
         </div>
-
-        <!-- Калибровка -->
-        <div
-          v-show="activeTab === 'calibration'"
-          class="service-content"
-          id="panel-calibration"
-          role="tabpanel"
-          :aria-labelledby="`tab-calibration`"
-        >
-          <div class="service-detail">
-            <h2 class="service-title">
-              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-balance-scale"></i></span> Калибровка оборудования
-            </h2>
-            <div class="service-description">
-              <p>Калибровка средств измерений – важнейшая процедура для поддержания точности и надёжности вашего оборудования. Мы выполняем калибровку в собственной лаборатории или на территории заказчика.</p>
-              <p>По итогам работ выдаём протоколы калибровки, которые могут быть использованы для внутреннего контроля качества и требований ISO.</p>
-            </div>
-            <div class="service-features">
-              <div class="service-feature">
-                <h4>Выездная калибровка</h4>
-                <p>Калибруем оборудование на месте эксплуатации без остановки производства</p>
-              </div>
-              <div class="service-feature">
-                <h4>Международное признание</h4>
-                <p>Наши протоколы калибровки соответствуют требованиям ISO/IEC 17025</p>
-              </div>
-            </div>
-            <div class="service-pricing">
-              <h3>Стоимость калибровки</h3>
-              <div class="pricing-table">
-                <table>
-                  <thead>
-                    <tr><th>Тип прибора</th><th>Срок</th><th>Стоимость</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td>Манометры</td><td>1-2 дня</td><td class="price-amount">от 1 000 ₽</td></tr>
-                    <tr><td>Термометры</td><td>1-2 дня</td><td class="price-amount">от 1 200 ₽</td></tr>
-                    <tr><td>Расходомеры</td><td>2-3 дня</td><td class="price-amount">от 3 500 ₽</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Ремонт -->
-        <div
-          v-show="activeTab === 'repair'"
-          class="service-content"
-          id="panel-repair"
-          role="tabpanel"
-          :aria-labelledby="`tab-repair`"
-        >
-          <div class="service-detail">
-            <h2 class="service-title">
-              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-wrench"></i></span> Ремонт оборудования
-            </h2>
-            <div class="service-description">
-              <p>Выполняем ремонт любых типов контрольно-измерительных приборов: манометров, термометров, расходомеров, анализаторов и другого оборудования. Восстанавливаем работоспособность, заменяем изношенные детали и проводим послеремонтную поверку.</p>
-              <p>На все работы предоставляем гарантию до 12 месяцев.</p>
-            </div>
-            <div class="service-features">
-              <div class="service-feature">
-                <h4>Склад запчастей</h4>
-                <p>Оригинальные комплектующие в наличии для большинства моделей</p>
-              </div>
-              <div class="service-feature">
-                <h4>Срочный ремонт</h4>
-                <p>Выполняем ремонт в течение 1–3 дней по согласованию</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Консультации -->
-        <div
-          v-show="activeTab === 'consulting'"
-          class="service-content"
-          id="panel-consulting"
-          role="tabpanel"
-          :aria-labelledby="`tab-consulting`"
-        >
-          <div class="service-detail">
-            <h2 class="service-title">
-              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-lightbulb"></i></span> Инженерные консультации
-            </h2>
-            <div class="service-description">
-              <p>Наши инженеры помогают подобрать оптимальное оборудование, разработать методики измерений, провести анализ погрешностей и оптимизировать процессы контроля качества.</p>
-              <p>Консультации проводятся как в офисе компании, так и выездом на производственную площадку заказчика.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Монтаж -->
-        <div
-          v-show="activeTab === 'installation'"
-          class="service-content"
-          id="panel-installation"
-          role="tabpanel"
-          :aria-labelledby="`tab-installation`"
-        >
-          <div class="service-detail">
-            <h2 class="service-title">
-              <span class="service-icon-large" aria-hidden="true"><i class="fas fa-plug"></i></span> Монтаж и пусконаладка
-            </h2>
-            <div class="service-description">
-              <p>Профессиональный монтаж контрольно-измерительных приборов, подключение к системам автоматизации, настройка параметров и пусконаладка оборудования.</p>
-              <p>Работы выполняются сертифицированными специалистами с соблюдением всех технических регламентов.</p>
-            </div>
+        <div class="partner-block__info">
+          <h2>Наш партнёр — РМЦ «Калиброн»</h2>
+          <p>
+            Метрологическая лаборатория РМЦ «Калиброн» уже более 15 лет оказывает услуги поверки и калибровки средств измерений.
+            Аккредитация № РОСС RU.0001.310096. Штат из более чем 30 высококвалифицированных метрологов.
+          </p>
+          <div class="advantages-grid">
+            <div class="advantage"><i class="fas fa-check-circle"></i> 17 лет опыта</div>
+            <div class="advantage"><i class="fas fa-check-circle"></i> Собственный парк контрольных калибров</div>
+            <div class="advantage"><i class="fas fa-check-circle"></i> Ежегодное расширение аккредитации</div>
+            <div class="advantage"><i class="fas fa-check-circle"></i> Строгий отбор и высокая квалификация персонала</div>
           </div>
         </div>
       </div>
 
-      <div class="certificates-section">
-        <h2 style="text-align: center; margin-bottom: 30px;">Наши сертификаты и допуски</h2>
-        <div class="certificates-grid">
-          <div v-for="cert in certificates" :key="cert.title" class="certificate-item">
-            <div class="certificate-icon" aria-hidden="true"><i :class="cert.icon"></i></div>
-            <h4>{{ cert.title }}</h4>
+      <!-- Категории СИ -->
+      <div class="categories-section">
+        <h2 class="section-title">Области оказываемых услуг</h2>
+        
+        <div v-for="cat in serviceCategories" :key="cat.id" class="category-item" :id="'category-' + cat.id">
+          <div class="category-item__header">
+            <i :class="cat.icon"></i>
+            <h3>{{ cat.title }}</h3>
           </div>
+          <p>{{ cat.description }}</p>
+          <ul v-if="cat.examples" class="examples-list">
+            <li v-for="ex in cat.examples" :key="ex">{{ ex }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Призыв к действию -->
+      <div class="cta-block">
+        <h2>Готовы начать?</h2>
+        <p>Свяжитесь с нами для консультации или расчёта стоимости услуг</p>
+        <div class="cta-block__buttons">
+          <a href="https://calibronrmc.ru" target="_blank" class="btn btn-primary">
+            <i class="fas fa-external-link-alt"></i> Перейти на сайт партнёра
+          </a>
+          <router-link to="/contacts" class="btn btn-outline">
+            <i class="fas fa-envelope"></i> Наши контакты
+          </router-link>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Service',
-  data() {
-    return {
-      activeTab: 'verification',
-      serviceCards: [
-        { id: 'verification', icon: 'fas fa-sync-alt', title: 'Поверка приборов', description: 'Официальная поверка контрольно-измерительных приборов с выдачей свидетельств установленного образца.' },
-        { id: 'calibration', icon: 'fas fa-balance-scale', title: 'Калибровка', description: 'Калибровка оборудования в собственной лаборатории с применением эталонных средств измерений.' },
-        { id: 'repair', icon: 'fas fa-wrench', title: 'Ремонт оборудования', description: 'Качественный ремонт любых контрольно-измерительных приборов с гарантией на выполненные работы.' }
-      ],
+<script setup>
+import { ref } from 'vue'
 
-      processSteps: [
-        { number: 1, title: 'Заявка', description: 'Вы оставляете заявку на сайте или по телефону' },
-        { number: 2, title: 'Доставка', description: 'Передаете приборы нам курьером или привозите сами' },
-        { number: 3, title: 'Поверка', description: 'Проводим поверку в нашей лаборатории' },
-        { number: 4, title: 'Документы', description: 'Выдаем свидетельства и возвращаем приборы' }
-      ],
-      pricing: [
-        { type: 'Манометры аналоговые', term: '1-2 дня', price: 'от 800 ₽' },
-        { type: 'Манометры цифровые', term: '2-3 дня', price: 'от 1 500 ₽' },
-        { type: 'Термометры', term: '1-2 дня', price: 'от 900 ₽' },
-        { type: 'Расходомеры', term: '2-4 дня', price: 'от 3 000 ₽' }
-      ],
-      certificates: [
-        { icon: 'fas fa-file-alt', title: 'Свидетельство об аккредитации' },
-        { icon: 'fas fa-building', title: 'Лицензия МЧС' },
-        { icon: 'fas fa-balance-scale', title: 'Свидетельство поверителя' },
-        { icon: 'fas fa-microscope', title: 'Аттестат лаборатории' },
-        { icon: 'fas fa-handshake', title: 'Партнерские сертификаты' }
-      ]
-    };
+const mainServices = [
+  {
+    id: 'linear',
+    icon: 'fas fa-ruler-combined',
+    title: 'Поверка и калибровка линейно-угловых СИ',
+    description: 'Штангенциркули, микрометры, нутромеры, глубиномеры, угломеры, меры длины, линейки, координатные машины.'
   },
-  methods: {
-    goToTab(tabId) {
-      this.activeTab = tabId;
-      // Плавный скролл к вкладке (опционально)
-      const tabElement = document.getElementById(`tab-${tabId}`);
-      if (tabElement) {
-        tabElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-    }
+  {
+    id: 'pressure',
+    icon: 'fas fa-tachometer-alt',
+    title: 'Поверка средств измерений давления и вакуума',
+    description: 'Манометры, вакуумметры, датчики давления, барометры, напоромеры, тягонапоромеры.'
+  },
+  {
+    id: 'temperature',
+    icon: 'fas fa-thermometer-half',
+    title: 'Поверка средств измерений температуры',
+    description: 'Термометры, термопары, термопреобразователи, пирометры, тепловизоры, логгеры температуры.'
+  },
+  {
+    id: 'frequency',
+    icon: 'fas fa-clock',
+    title: 'Поверка средств измерений времени и частоты',
+    description: 'Частотомеры, секундомеры, таймеры, генераторы сигналов, осциллографы.'
+  },
+  {
+    id: 'mass',
+    icon: 'fas fa-weight-hanging',
+    title: 'Поверка средств измерений веса и массы',
+    description: 'Весы лабораторные, весы платформенные, гири, дозаторы, весовые терминалы.'
+  },
+  {
+    id: 'chemical',
+    icon: 'fas fa-flask',
+    title: 'Поверка средств измерений химического состава',
+    description: 'Анализаторы, pH-метры, кондуктометры, хроматографы, спектрофотометры, газоанализаторы.'
   }
-};
+]
+
+const serviceCategories = ref([
+  {
+    id: 'linear',
+    icon: 'fas fa-ruler-combined',
+    title: 'Линейно-угловые средства измерений',
+    description: 'Поверка и калибровка штангенциркулей, микрометров, нутромеров, глубиномеров, угломеров, мер длины, линеек, координатных машин, калибров, щупов и шаблонов.',
+    examples: ['Штангенциркули', 'Микрометры', 'Нутромеры', 'Глубиномеры', 'Угломеры', 'Меры длины']
+  },
+  {
+    id: 'pressure',
+    icon: 'fas fa-tachometer-alt',
+    title: 'Средства измерений давления и вакуума',
+    description: 'Поверка и калибровка манометров, вакуумметров, датчиков давления, барометров, напоромеров, тягонапоромеров.',
+    examples: ['Манометры', 'Вакуумметры', 'Датчики давления', 'Барометры']
+  },
+  {
+    id: 'temperature',
+    icon: 'fas fa-thermometer-half',
+    title: 'Средства измерений температуры',
+    description: 'Поверка и калибровка термометров, термопар, термопреобразователей, пирометров, тепловизоров, логгеров температуры.',
+    examples: ['Термометры', 'Термопары', 'Пирометры', 'Тепловизоры']
+  },
+  {
+    id: 'frequency',
+    icon: 'fas fa-clock',
+    title: 'Средства измерений времени и частоты',
+    description: 'Поверка и калибровка частотомеров, секундомеров, таймеров, генераторов сигналов, осциллографов.',
+    examples: ['Частотомеры', 'Секундомеры', 'Таймеры', 'Генераторы сигналов']
+  },
+  {
+    id: 'mass',
+    icon: 'fas fa-weight-hanging',
+    title: 'Средства измерений веса и массы',
+    description: 'Поверка и калибровка весов лабораторных, весов платформенных, гирь, дозаторов, весовых терминалов.',
+    examples: ['Весы лабораторные', 'Весы платформенные', 'Гири', 'Дозаторы']
+  },
+  {
+    id: 'chemical',
+    icon: 'fas fa-flask',
+    title: 'Средства измерений химического состава веществ',
+    description: 'Поверка и калибровка анализаторов, pH-метров, кондуктометров, хроматографов, спектрофотометров, газоанализаторов.',
+    examples: ['Анализаторы', 'pH-метры', 'Хроматографы', 'Спектрофотометры']
+  }
+])
+
+const scrollToCategory = (id) => {
+  const el = document.getElementById('category-' + id)
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+const imgFallback = (event) => {
+  if (event?.target) {
+    event.target.style.display = 'none'
+  }
+}
 </script>
 
 <style scoped>
-/* Усиленные fallback для CSS-переменных */
+/* ---- ПЕРЕМЕННЫЕ (защита от отсутствия глобальных) ---- */
 .services-page {
-  --color-border: #e0e0e0;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
-  --color-text-light: #666;
+  --color-primary: #51ae45;
+  --color-primary-dark: #156135;
+  --color-text: #1a1a1a;
+  --color-text-light: #4a4a4a;
+  --color-bg: #f8fcf8;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-hover: 0 14px 32px rgba(0,0,0,0.09);
 }
-
 .services-container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 20px;
 }
-
 .services-page {
-  padding: 40px 0;
+  padding: 40px 0 60px;
+  font-family: 'Arimo', sans-serif;
 }
 
+/* ---- HERO ---- */
 .services-header {
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 60px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f8fcf8 0%, #e8f5e9 100%);
+  border-radius: var(--radius-lg);
 }
-
-.services-header h1 {
-  font-size: 36px;
-  color: #333;
+.services-header__title {
+  font-family: 'Mulish', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-text);
   margin-bottom: 15px;
 }
-
-.services-header p {
-  color: #666;
-  font-size: 18px;
-  max-width: 700px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 30px;
-  margin-top: 40px;
-  margin-bottom: 50px;
-}
-
-.service-card {
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 30px;
-  text-align: center;
-  transition: all 0.3s;
-  height: 100%;
-}
-
-.service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-md);
-  border-color: #51AE45;
-}
-
-.service-card-icon {
-  font-size: 48px;
-  color: #51AE45;
-  margin-bottom: 20px;
-}
-
-.service-card h3 {
-  font-size: 20px;
-  margin-bottom: 15px;
-  color: #333;
-}
-
-.service-card p {
+.services-header__lead {
+  font-size: 1.1rem;
   color: var(--color-text-light);
-  font-size: 14px;
+  max-width: 700px;
+  margin: 0 auto 24px;
   line-height: 1.6;
-  margin-bottom: 20px;
 }
 
-.service-card .btn {
-  margin-top: 10px;
-}
-
-.services-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 40px;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 10px;
-  flex-wrap: wrap;
-}
-
-.service-tab {
-  padding: 12px 25px;
-  background: #f5f7fa;
-  border: 1px solid var(--color-border);
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: all 0.3s;
+/* ---- ОБЩИЕ КНОПКИ ---- */
+.btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-family: inherit;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  font-family: 'Mulish', sans-serif;
 }
-
-.service-tab.active,
-.service-tab:hover {
-  background: #51AE45;
+.btn-primary {
+  background: var(--color-primary);
   color: white;
-  border-color: #51AE45;
+  border-color: var(--color-primary);
+}
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+.btn-outline {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.btn-outline:hover {
+  background: var(--color-primary);
+  color: white;
+}
+.btn-large {
+  padding: 16px 36px;
+  font-size: 1.1rem;
 }
 
-.service-tab-icon {
-  font-size: 18px;
-}
-
-.services-content {
-  position: relative;
-}
-
-.service-content {
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.service-detail {
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 40px;
-  margin-bottom: 40px;
-}
-
-.service-title {
-  font-size: 28px;
-  color: #333;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.service-icon-large {
-  font-size: 40px;
-  color: #51AE45;
-}
-
-.service-description {
-  color: var(--color-text-light);
-  line-height: 1.7;
-  margin-bottom: 30px;
-  font-size: 16px;
-}
-
-.service-features {
+/* ---- КАРТОЧКИ ОСНОВНЫХ УСЛУГ ---- */
+.services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 60px;
 }
-
-.service-feature {
-  background: #f8f9fa;
-  padding: 20px;
-  border-radius: 6px;
-  border-left: 4px solid #51AE45;
+.service-card {
+  background: white;
+  border: 1px solid #eef2ee;
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  text-align: center;
+  transition: transform 0.25s, box-shadow 0.25s;
+  box-shadow: var(--shadow-sm);
 }
-
-.service-feature h4 {
-  color: #333;
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+.service-card__icon {
+  font-size: 2.8rem;
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+.service-card__title {
+  font-family: 'Mulish', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 700;
   margin-bottom: 10px;
-  font-size: 16px;
+  line-height: 1.4;
 }
-
-.service-feature p {
+.service-card__desc {
   color: var(--color-text-light);
-  font-size: 14px;
+  margin-bottom: 18px;
   line-height: 1.5;
+  font-size: 0.95rem;
 }
 
-.service-process {
-  margin-bottom: 40px;
-}
-
-.process-steps {
-  display: flex;
-  gap: 20px;
-  overflow-x: auto;
-  padding: 20px 0;
-}
-
-.process-step {
-  flex: 0 0 200px;
-  text-align: center;
-  padding: 20px;
+/* ---- БЛОК ПАРТНЁРА ---- */
+.partner-block {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 32px;
+  align-items: center;
   background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  position: relative;
+  border: 1px solid #eef2ee;
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 60px;
+  box-shadow: var(--shadow-sm);
 }
-
-.process-step-number {
-  width: 40px;
-  height: 40px;
-  background: #51AE45;
-  color: white;
-  border-radius: 50%;
+.partner-block__image img {
+  width: 100%;
+  height: auto;
+}
+.advantages-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.advantage {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  margin: 0 auto 15px;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+.advantage i {
+  color: var(--color-primary);
 }
 
-.process-step h4 {
-  margin-bottom: 10px;
-  color: #333;
+/* ---- КАТЕГОРИИ УСЛУГ ---- */
+.categories-section {
+  margin-bottom: 60px;
 }
-
-.process-step p {
-  color: var(--color-text-light);
-  font-size: 14px;
-}
-
-.service-pricing {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  padding: 30px;
-  border-radius: 8px;
+.section-title {
+  font-family: 'Mulish', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
   margin-bottom: 40px;
 }
-
-.pricing-table {
-  overflow-x: auto;
-  margin-top: 20px;
-}
-
-.pricing-table table {
-  width: 100%;
-  border-collapse: collapse;
+.category-item {
   background: white;
-  border-radius: 4px;
-  overflow: hidden;
+  border: 1px solid #eef2ee;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: box-shadow 0.25s;
+  box-shadow: var(--shadow-sm);
 }
-
-.pricing-table th {
-  background: #51AE45;
-  color: white;
-  padding: 15px;
-  text-align: left;
-  font-weight: 600;
+.category-item:hover {
+  box-shadow: var(--shadow-hover);
 }
-
-.pricing-table td {
-  padding: 15px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.pricing-table tr:hover {
-  background: #f8f9fa;
-}
-
-.price-amount {
-  color: #51AE45;
+.category-item__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.4rem;
   font-weight: 700;
-  font-size: 18px;
+  font-family: 'Mulish', sans-serif;
+  margin-bottom: 8px;
+}
+.category-item__header i {
+  color: var(--color-primary);
+}
+.examples-list {
+  columns: 2;
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+.examples-list li::before {
+  content: "• ";
+  color: var(--color-primary);
+  font-weight: bold;
 }
 
-.certificates-section {
-  margin-top: 60px;
-  padding-top: 40px;
-  border-top: 1px solid var(--color-border);
-}
-
-.certificates-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.certificate-item {
-  background: white;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 20px;
+/* ---- CTA ---- */
+.cta-block {
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  color: white;
   text-align: center;
-  transition: all 0.3s;
+  padding: 48px 20px;
+  border-radius: var(--radius-lg);
+}
+.cta-block h2 {
+  font-family: 'Mulish', sans-serif;
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+.cta-block__buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+.cta-block__buttons .btn-outline {
+  border-color: white;
+  color: white;
+}
+.cta-block__buttons .btn-outline:hover {
+  background: white;
+  color: var(--color-primary-dark);
 }
 
-.certificate-item:hover {
-  border-color: #51AE45;
-  box-shadow: var(--shadow-md);
-}
-
-.certificate-icon {
-  font-size: 40px;
-  color: #51AE45;
-  margin-bottom: 15px;
-}
-
-.certificate-item h4 {
-  font-size: 14px;
-  color: #333;
-}
-
-@media (max-width: 1024px) {
-  .services-tabs {
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 10px;
-  }
-  .service-tab {
-    flex-shrink: 0;
-  }
-}
-
+/* ---- АДАПТИВ ---- */
 @media (max-width: 768px) {
-  .services-header h1 {
-    font-size: 28px;
-  }
-  .services-header p {
-    font-size: 16px;
-  }
-  .service-detail {
-    padding: 20px;
-  }
-  .service-title {
-    font-size: 24px;
-  }
-  .process-steps {
-    flex-direction: column;
-  }
-  .process-step {
-    flex: 1;
-  }
-  .services-grid {
+  .partner-block {
     grid-template-columns: 1fr;
+  }
+  .advantages-grid {
+    grid-template-columns: 1fr;
+  }
+  .examples-list {
+    columns: 1;
   }
 }
 </style>

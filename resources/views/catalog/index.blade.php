@@ -7,7 +7,7 @@
             <div class="col-md-4 mb-4">
                 <div class="card">
                     @if($category->image)
-                        <img src="{{ asset('imgproc/mikronproduction/' . $category->image . '/') }}" class="card-img-top" alt="{{ $category->title }}">
+                        <img src="{{ asset('imgproc/mikronproduction/' . $category->image) }}" class="card-img-top" alt="{{ $category->title }}">
                     @else
                         <img src="{{ asset('img/logo.png') }}" class="card-img-top" alt="Нет фото">
                     @endif

@@ -4,10 +4,9 @@
       <div class="container">
         <div class="header-content">
           <a href="/" class="logo">
-            <img src="@/assets/logo1.gif" class="logo-image" alt="Микрон">
             <div class="logo-text">
               <img src="@/assets/logo.png" class="logo-full" alt="Микрон">
-              <div class="logo-tagline">Контрольно-измерительные приборы</div>
+              <div class="logo-tagline">АО Торговый Дом Завод МИКРОН</div>
             </div>
           </a>
 
@@ -29,19 +28,19 @@
           </div>
 
           <div class="user-actions desktop-actions">
-            <router-link to="/services" class="action-button">
+            <router-link to="/service" class="action-button">
               <i class="action-icon fas fa-wrench"></i>
               <span>Услуги</span>
             </router-link>
             <router-link to="/favorites" class="action-button">
               <i class="action-icon far fa-heart"></i>
               <span>Избранное</span>
-              <!-- <span class="action-badge">0</span> -->
             </router-link>
             <router-link to="/cart" class="action-button">
               <i class="action-icon fas fa-shopping-cart"></i>
               <span>Корзина</span>
-              <span class="action-badge">{{ cartTotalQuantity }}</span>
+              <!-- Скрываем бейдж, если товаров нет -->
+              <span v-if="cartTotalQuantity > 0" class="action-badge">{{ cartTotalQuantity }}</span>
             </router-link>
           </div>
 
@@ -68,7 +67,7 @@
             </button>
           </div>
           <div class="mobile-menu-actions">
-            <router-link to="/services" class="mobile-action" @click="closeMobileMenu">
+            <router-link to="/service" class="mobile-action" @click="closeMobileMenu">
               <i class="fas fa-wrench"></i>
               <span>Услуги</span>
             </router-link>
@@ -79,7 +78,7 @@
             <router-link to="/cart" class="mobile-action" @click="closeMobileMenu">
               <i class="fas fa-shopping-cart"></i>
               <span>Корзина</span>
-              <span class="action-badge">{{ cartTotalQuantity }}</span>
+              <span v-if="cartTotalQuantity > 0" class="action-badge">{{ cartTotalQuantity }}</span>
             </router-link>
           </div>
         </div>
@@ -89,7 +88,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { useCartStore } from '@/stores/cart';
 import { mapState } from 'pinia';
 import CatalogMenu from '@/components/catalog/CatalogMenu.vue';
@@ -113,7 +111,6 @@ export default {
   mounted() {
     document.addEventListener('click', this.handleOutsideClick);
     document.addEventListener('keydown', this.handleEscKey);
-    // Загружаем корзину из localStorage
     const cartStore = useCartStore();
     cartStore.loadFromLocalStorage();
   },
@@ -123,22 +120,14 @@ export default {
     document.removeEventListener('keydown', this.handleEscKey);
   },
   methods: {
-    async handleSearch() {
-      if (!this.searchQuery.trim()) return;
-      try {
-        const { data } = await axios.get(`/api/catalog/search?q=${encodeURIComponent(this.searchQuery)}`);
-        this.$router.push({ path: '/catalog', query: { search: this.searchQuery } });
-      } catch (error) {
-        console.error(error);
-      }
+    handleSearch() {
+      const query = this.searchQuery.trim();
+      if (!query) return;
+      this.$router.push({ path: '/catalog', query: { search: query } });
     },
     toggleMobileMenu() {
       this.mobileMenuOpen = !this.mobileMenuOpen;
-      if (this.mobileMenuOpen) {
-        document.body.style.overflow = 'hidden';
-      } else {
-        document.body.style.overflow = '';
-      }
+      document.body.style.overflow = this.mobileMenuOpen ? 'hidden' : '';
     },
     closeMobileMenu() {
       this.mobileMenuOpen = false;
@@ -168,7 +157,7 @@ export default {
 </script>
 
 <style scoped>
-/* Оставляем только специфические стили, общие вынесены в global.css */
+/* Стили без изменений, оставлены ваши */
 .site-header {
   background: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -193,18 +182,10 @@ export default {
   text-decoration: none;
   gap: 12px;
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  transition: transform var(--transition);
 }
 .logo:hover {
   transform: scale(1.02);
-}
-.logo-image {
-  height: 40px;
-  width: auto;
-}
-.logo-text {
-  display: flex;
-  flex-direction: column;
 }
 .logo-full {
   height: 35px;
@@ -212,9 +193,28 @@ export default {
   object-fit: contain;
 }
 .logo-tagline {
+  font-family: var(--font-body);
   font-size: 12px;
-  color: #666;
+  color: var(--color-muted);
   margin-top: 2px;
+}
+
+.catalog-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.catalog-button:hover {
+  background: var(--color-primary-dark);
 }
 
 .search-block {
@@ -225,7 +225,7 @@ export default {
 .search-form {
   display: flex;
   border: 2px solid var(--color-primary);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 .search-form:focus-within {
@@ -237,6 +237,7 @@ export default {
   border: none;
   outline: none;
   font-size: 16px;
+  font-family: var(--font-body);
 }
 .search-button {
   background: var(--color-primary);
@@ -247,10 +248,14 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: background 0.2s ease;
+  transition: background var(--transition), transform 0.2s ease;
+  font-family: var(--font-body);
+  font-weight: 600;
+  transform: scale(1);
 }
 .search-button:hover {
   background: var(--color-primary-dark);
+  transform: scale(1.05);
 }
 
 .user-actions {
@@ -263,9 +268,10 @@ export default {
   flex-direction: column;
   align-items: center;
   text-decoration: none;
-  color: #333;
+  color: var(--color-text);
   position: relative;
-  transition: color 0.2s ease;
+  transition: color var(--transition);
+  font-family: var(--font-body);
 }
 .action-button:hover {
   color: var(--color-primary);
@@ -300,7 +306,7 @@ export default {
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #333;
+  color: var(--color-text);
   padding: 8px;
 }
 .mobile-menu-btn:hover {
@@ -336,7 +342,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-heading);
 }
 .mobile-menu-header h3 {
   margin: 0;
@@ -347,7 +354,7 @@ export default {
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: #666;
+  color: var(--color-muted);
 }
 .close-menu:hover {
   color: #ff4444;
@@ -364,13 +371,14 @@ export default {
   gap: 15px;
   padding: 12px;
   text-decoration: none;
-  color: #333;
-  border-radius: 8px;
-  transition: background 0.2s ease;
+  color: var(--color-text);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition);
+  font-family: var(--font-body);
   position: relative;
 }
 .mobile-action:hover {
-  background: #f5f7fa;
+  background: var(--color-primary-light);
 }
 .mobile-action i {
   width: 24px;
@@ -378,15 +386,12 @@ export default {
   color: var(--color-primary);
 }
 .mobile-action .action-badge {
-  position: relative;
-  top: 0;
-  right: auto;
   margin-left: auto;
+  position: static;
 }
 
 /* Адаптивность */
 @media (max-width: 1024px) {
-  .logo-image { height: 35px; }
   .logo-full { height: 30px; }
   .logo-tagline { font-size: 11px; }
   .search-block { max-width: 400px; }
@@ -395,7 +400,6 @@ export default {
 }
 @media (max-width: 768px) {
   .main-header { padding: 12px 0; }
-  .logo-image { height: 30px; }
   .logo-full { height: 25px; }
   .logo-text { display: none; }
   .search-block { max-width: 300px; }
@@ -416,10 +420,8 @@ export default {
   .logo-text { display: flex; }
   .logo-full { height: 22px; }
   .logo-tagline { font-size: 10px; }
-  .logo-image { height: 28px; }
 }
 @media (max-width: 480px) {
-  .logo-image { height: 26px; }
   .logo-full { height: 20px; }
   .logo-tagline { font-size: 9px; }
   .search-input { padding: 8px 10px; font-size: 13px; }

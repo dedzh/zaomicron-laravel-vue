@@ -12,6 +12,7 @@
         <div v-for="doc in documents" :key="doc.id" class="certificate-card">
           <a :href="doc.fileUrl" target="_blank" rel="noopener noreferrer" class="certificate-link">
             <div class="certificate-preview">
+              <!-- Всегда отображаем img: для PDF – data‑URI иконки, для картинок – само изображение -->
               <img :src="doc.thumbnail" :alt="doc.title" loading="lazy" />
               <div class="certificate-overlay">
                 <i class="fas fa-search-plus" aria-hidden="true"></i>
@@ -33,38 +34,67 @@
 </template>
 
 <script>
+// Импорт изображений (превью и они же открываются по клику)
+import img1 from '@/assets/docs/img_1.jpg'
+import img2 from '@/assets/docs/img_2.jpg'
+import img3 from '@/assets/docs/img_3.jpg'
+import img4 from '@/assets/docs/img_4.jpg'
+import img5 from '@/assets/docs/img_5.jpg'
+import img6 from '@/assets/docs/img_6.jpg'
+import img7 from '@/assets/docs/img_7.jpg'
+
+// Импорт PDF‑файлов (список из вашего сообщения)
+import pdf85174 from '@/assets/docs/85174-22.pdf'
+import pdf89267 from '@/assets/docs/89267-23.pdf'
+import pdf89737 from '@/assets/docs/89737-23.pdf'
+import pdf90358 from '@/assets/docs/90358-23.pdf'
+import pdf90362 from '@/assets/docs/90362-23.pdf'
+import pdf90663 from '@/assets/docs/90663-23.pdf'
+import pdf91149 from '@/assets/docs/91149-24.pdf'
+import pdf91454 from '@/assets/docs/91454-24.pdf'
+import pdf92447 from '@/assets/docs/92447-24.pdf'
+import pdf93019 from '@/assets/docs/93019-24.pdf'
+import pdf93114 from '@/assets/docs/93114-24.pdf'
+import pdf93125 from '@/assets/docs/93125-24.pdf'
+import pdf93689 from '@/assets/docs/93689-24.pdf'
+import pdf93730 from '@/assets/docs/93730-24.pdf'
+import pdf93960 from '@/assets/docs/93960-24.pdf'
+import pdf94065 from '@/assets/docs/94065-24.pdf'
+
+// data‑URI иконки PDF (серая, нейтральная, не зависит от внешних файлов)
+const PDF_ICON = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 48 48\'%3E%3Cpath fill=\'%23E53935\' d=\'M40 45H8c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h22l12 12v28c0 1.1-.9 2-2 2z\'/%3E%3Cpath fill=\'%23FFCDD2\' d=\'M38.5 14H29c-1.1 0-2-.9-2-2V3.5L38.5 14z\'/%3E%3Ctext x=\'12\' y=\'34\' font-family=\'Arial, sans-serif\' font-size=\'10\' font-weight=\'bold\' fill=\'%23fff\'%3EPDF%3C/text%3E%3C/svg%3E'
+
 export default {
   name: 'Certificates',
   data() {
     return {
       documents: [
-        // Изображения (сертификаты, свидетельства)
-        { id: 1, title: 'Свидетельство о регистрации', thumbnail: '@/assets/small/img_7.png', fileUrl: '@/assets/smallbig/img_7.jpg', isPdf: false },
-        { id: 2, title: 'Сертификат соответствия', thumbnail: '@/assets/small/img_8.png', fileUrl: '@/assets/smallbig/img_8.jpg', isPdf: false },
-        { id: 3, title: 'Лицензия', thumbnail: '@/assets/small/img_10.png', fileUrl: '@/assets/smallbig/img_10.jpg', isPdf: false },
-        { id: 4, title: 'Аттестат аккредитации', thumbnail: '@/assets/small/img_16.png', fileUrl: '@/assets/smallbig/img_16.jpg', isPdf: false },
-        { id: 5, title: 'Сертификат ISO', thumbnail: '@/assets/small/img_12.png', fileUrl: '@/assets/smallbig/img_12.jpg', isPdf: false },
-        { id: 6, title: 'Свидетельство поверителя', thumbnail: '@/assets/small/img_15.png', fileUrl: '@/assets/smallbig/img_15.jpg', isPdf: false },
-        { id: 7, title: 'Декларация соответствия', thumbnail: '@/assets/small/img_17.png', fileUrl: '@/assets/smallbig/img_17.jpg', isPdf: false },
-        // PDF-сертификаты (образцы)
-        { id: 8, title: 'Сертификат № 77991-20', thumbnail: '@/assets/small/sertificat.png', fileUrl: '@/assets/smallbig/77991-20.pdf', isPdf: true },
-        { id: 9, title: 'Сертификат № 82404-21', thumbnail: '@/assets/small/sertificat.png', fileUrl: '@/assets/smallbig/82404-21.pdf', isPdf: true },
-        { id: 10, title: 'Сертификат № 85174-22', thumbnail: '@/assets/small/sertificat.png', fileUrl: '@/assets/smallbig/85174-22.pdf', isPdf: true },
-        { id: 11, title: 'Сертификат № 89267-23', thumbnail: '@/assets/small/sertificat.png', fileUrl: '@/assets/smallbig/89267-23.pdf', isPdf: true },
-        { id: 12, title: 'Сертификат № 89737-23', thumbnail: '@/assets/small/sertificat.png', fileUrl: '@/assets/smallbig/89737-23.pdf', isPdf: true },
-        { id: 13, title: 'Сертификат № 90358-23', thumbnail: '@/assets/small/sertificat.png', fileUrl: '@/assets/smallbig/90358-23.pdf', isPdf: true },
-        { id: 14, title: 'Сертификат № 90362-23', thumbnail: '@/assets/small/sertificat.png', fileUrl: '@/assets/smallbig/90362-23.pdf', isPdf: true },
-        { id: 15, title: 'Сертификат № 90663-23', thumbnail: '@/assets/small/sertificat.png', fileUrl: '@/assets/smallbig/90663-23.pdf', isPdf: true },
-        { id: 16, title: 'Сертификат № 91149-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/91149-24.pdf', isPdf: true },
-        { id: 17, title: 'Сертификат № 91454-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/91454-24.pdf', isPdf: true },
-        { id: 18, title: 'Сертификат № 92447-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/92447-24.pdf', isPdf: true },
-        { id: 19, title: 'Сертификат № 93019-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/93019-24.pdf', isPdf: true },
-        { id: 20, title: 'Сертификат № 93114-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/93114-24.pdf', isPdf: true },
-        { id: 21, title: 'Сертификат № 93125-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/93125-24.pdf', isPdf: true },
-        { id: 22, title: 'Сертификат № 93689-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/93689-24.pdf', isPdf: true },
-        { id: 23, title: 'Сертификат № 93730-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/93730-24.pdf', isPdf: true },
-        { id: 24, title: 'Сертификат № 93960-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/93960-24.pdf', isPdf: true },
-        { id: 25, title: 'Сертификат № 94065-24', thumbnail: '@/assets/smallsmall/sertificat.png', fileUrl: '@/assets/smallbig/94065-24.pdf', isPdf: true }
+        // 7 картинок (открываются сами себя)
+        { id: 1, title: 'Свидетельство о регистрации',    thumbnail: img1, fileUrl: img1, isPdf: false },
+        { id: 2, title: 'Сертификат соответствия',       thumbnail: img2, fileUrl: img2, isPdf: false },
+        { id: 3, title: 'Лицензия',                      thumbnail: img3, fileUrl: img3, isPdf: false },
+        { id: 4, title: 'Аттестат аккредитации',         thumbnail: img4, fileUrl: img4, isPdf: false },
+        { id: 5, title: 'Сертификат ISO',                thumbnail: img5, fileUrl: img5, isPdf: false },
+        { id: 6, title: 'Свидетельство поверителя',      thumbnail: img6, fileUrl: img6, isPdf: false },
+        { id: 7, title: 'Декларация соответствия',       thumbnail: img7, fileUrl: img7, isPdf: false },
+
+        // 16 PDF‑документов (эскиз – встроенная иконка)
+        { id: 8,  title: 'Сертификат № 85174-22', thumbnail: PDF_ICON, fileUrl: pdf85174, isPdf: true },
+        { id: 9,  title: 'Сертификат № 89267-23', thumbnail: PDF_ICON, fileUrl: pdf89267, isPdf: true },
+        { id: 10, title: 'Сертификат № 89737-23', thumbnail: PDF_ICON, fileUrl: pdf89737, isPdf: true },
+        { id: 11, title: 'Сертификат № 90358-23', thumbnail: PDF_ICON, fileUrl: pdf90358, isPdf: true },
+        { id: 12, title: 'Сертификат № 90362-23', thumbnail: PDF_ICON, fileUrl: pdf90362, isPdf: true },
+        { id: 13, title: 'Сертификат № 90663-23', thumbnail: PDF_ICON, fileUrl: pdf90663, isPdf: true },
+        { id: 14, title: 'Сертификат № 91149-24', thumbnail: PDF_ICON, fileUrl: pdf91149, isPdf: true },
+        { id: 15, title: 'Сертификат № 91454-24', thumbnail: PDF_ICON, fileUrl: pdf91454, isPdf: true },
+        { id: 16, title: 'Сертификат № 92447-24', thumbnail: PDF_ICON, fileUrl: pdf92447, isPdf: true },
+        { id: 17, title: 'Сертификат № 93019-24', thumbnail: PDF_ICON, fileUrl: pdf93019, isPdf: true },
+        { id: 18, title: 'Сертификат № 93114-24', thumbnail: PDF_ICON, fileUrl: pdf93114, isPdf: true },
+        { id: 19, title: 'Сертификат № 93125-24', thumbnail: PDF_ICON, fileUrl: pdf93125, isPdf: true },
+        { id: 20, title: 'Сертификат № 93689-24', thumbnail: PDF_ICON, fileUrl: pdf93689, isPdf: true },
+        { id: 21, title: 'Сертификат № 93730-24', thumbnail: PDF_ICON, fileUrl: pdf93730, isPdf: true },
+        { id: 22, title: 'Сертификат № 93960-24', thumbnail: PDF_ICON, fileUrl: pdf93960, isPdf: true },
+        { id: 23, title: 'Сертификат № 94065-24', thumbnail: PDF_ICON, fileUrl: pdf94065, isPdf: true }
       ]
     };
   }
@@ -72,6 +102,7 @@ export default {
 </script>
 
 <style scoped>
+/* без изменений, как в вашем коде */
 .certificates-page {
   --color-border: #e0e0e0;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);

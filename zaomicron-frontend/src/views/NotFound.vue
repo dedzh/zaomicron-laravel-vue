@@ -1,49 +1,53 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col>
-        <div>
-        <h1>404 – Страница не найдена</h1>
-        <v-btn color="secondary" to="/">На главную</v-btn>
-        </div>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div class="not-found">
+    <h1 class="not-found__code">404</h1>
+    <p class="not-found__text">Страница не найдена</p>
+    <router-link to="/" class="btn btn-primary">На главную</router-link>
+  </div>
 </template>
 
-<style>
-@media (max-width: 992px) {
-	.infobar_cookie {
-		width: 80%;
-	}
+<script setup>
+</script>
+
+<style scoped>
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 32px;
 }
 
-@media (min-width: 992px) {
-	.infobar_cookie {
-		width: 58%;
-	}
+.not-found__code {
+  font-family: 'Mulish', sans-serif;
+  font-size: 120px;
+  font-weight: 800;
+  color: #51ae45;
+  line-height: 1;
+  margin-bottom: 16px;
 }
 
-.infobar_cookie {
-	position: fixed;
-	margin: auto;
-	right: 0;
-	bottom: 20px;
-	left: 0;
-	z-index: 1030;
-	padding: 20px;
-	background: rgba(0, 0, 0, .85);
-	transition: bottom 0.8s ease, opacity 0.8s ease;
-	color: #bebebe;
-	font-size: 12px;
+.not-found__text {
+  font-family: 'Arimo', sans-serif;
+  font-size: 20px;
+  color: #555;
+  margin-bottom: 40px;
 }
-#oct-infobar-btn2 {
-	font-size: 16px;
-	margin-left: 20px;
-	padding: 5px;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 32px;
+  background: #51ae45;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: background 0.2s;
 }
-.infobar-text2 a {
-	color: white;
-	text-decoration: underline;
+.btn:hover {
+  background: #156135;
 }
 </style>

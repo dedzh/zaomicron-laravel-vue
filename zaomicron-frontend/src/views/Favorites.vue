@@ -16,12 +16,7 @@
       <ProductCard
         v-for="product in favoriteProducts"
         :key="product.id"
-        :id="product.id"
-        :name="product.name"
-        :sku="product.sku"
-        :price="product.price"
-        :image="product.image"
-        @add-to-cart="addToCart"
+        :product="product"
       />
     </div>
   </div>
@@ -31,7 +26,6 @@
 import axios from 'axios';
 import ProductCard from '@/components/catalog/ProductCard.vue';
 import { useFavoritesStore } from '@/stores/favorites';
-import { useCartStore } from '@/stores/cart';
 
 export default {
   name: 'Favorites',
@@ -57,44 +51,27 @@ export default {
       this.error = null;
       try {
         const ids = this.favoritesStore.items;
-        if (ids.length === 0) {
+        if (!ids.length) {
           this.favoriteProducts = [];
           return;
         }
-        // Загружаем данные о товарах по id
-        const promises = ids.map(id => axios.get(`/api/catalog/product/${id}`));
-        const responses = await Promise.all(promises);
-        this.favoriteProducts = responses.map(res => {
-          const p = res.data;
-          return {
-            id: p.id ?? p.ID,
-            name: p.name ?? p.NAME,
-            sku: p.sku ?? p.article ?? p.model ?? p.ID ?? '',
-            price: Number(p.price ?? p.PRICE ?? 0),
-            image: p.image ?? p.image_url ?? p.main_img ?? null,
-          };
+        const response = await axios.get('/api/catalog/favorites', {
+          params: { ids },
+          paramsSerializer: params => params.ids.map(id => `ids[]=${id}`).join('&')
         });
+        this.favoriteProducts = response.data;
       } catch (err) {
         console.error('Ошибка загрузки избранных товаров', err);
         this.error = 'Не удалось загрузить избранные товары. Попробуйте позже.';
       } finally {
         this.loading = false;
       }
-    },
-    addToCart(product) {
-      const cartStore = useCartStore();
-      cartStore.addToCart(product, 1);
-    },
+    }
   },
 };
 </script>
 
 <style scoped>
-.favorites-page {
-  padding: 20px 0;
-}
-.empty-favorites {
-  text-align: center;
-  padding: 50px;
-}
+.favorites-page { padding: 20px 0; }
+.empty-favorites { text-align: center; padding: 50px; }
 </style>

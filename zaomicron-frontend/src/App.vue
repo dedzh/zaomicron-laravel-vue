@@ -5,6 +5,7 @@
     <Navigation />
     <router-view />
     <Footer />
+    <CookieConsent />
  
   </div>
 </template>
@@ -15,6 +16,7 @@ import Header from '@/components/layout/Header.vue';
 import Navigation from '@/components/layout/Navigation.vue';
 import Footer from '@/components/layout/Footer.vue';
 import { useCartStore } from '@/stores/cart';
+import CookieConsent from '@/components/ui/CookieConsent.vue';
 
 export default {
   name: 'App',
@@ -22,6 +24,7 @@ export default {
     InfoBar,
     Header,
     Navigation,
+    CookieConsent,
     Footer
 
   },
