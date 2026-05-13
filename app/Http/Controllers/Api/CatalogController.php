@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 
 class CatalogController extends Controller
 {
@@ -36,36 +37,89 @@ class CatalogController extends Controller
         });
     }
 
+    /**
+     * Пошаговый каталог: подкатегории, счётчик товаров только в текущем узле (для гибридной страницы).
+     */
+    public function browse(?string $id = null)
+    {
+        if ($id !== null && $id !== '' && !ctype_digit((string) $id)) {
+            abort(404);
+        }
+
+        if ($id === null || $id === '') {
+            $current = null;
+            $nodes = Category::whereNull('parent_id')
+                ->withCount('children')
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get();
+            $breadcrumbs = [];
+        } else {
+            $current = Category::find((int) $id);
+            if (!$current) {
+                abort(404);
+            }
+            $nodes = $current->children()
+                ->withCount('children')
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get();
+            $breadcrumbs = $this->breadcrumbsFor($current);
+        }
+
+        $children = $nodes->map(fn(Category $c) => [
+            'id'           => $c->id,
+            'name'         => $c->name,
+            'has_children' => ($c->children_count ?? 0) > 0,
+        ])->values();
+
+        $directProductsCount = $current
+            ? (int) $current->products()->count()
+            : 0;
+
+        return response()->json([
+            'category'               => $current ? [
+                'id'        => $current->id,
+                'name'      => $current->name,
+                'parent_id' => $current->parent_id,
+            ] : null,
+            'children'               => $children,
+            'breadcrumbs'            => $breadcrumbs,
+            'direct_products_count'  => $directProductsCount,
+        ]);
+    }
+
     // Список товаров с фильтрацией, сортировкой и пагинацией
   public function products(Request $request)
 {
     $perPage = min(48, max(1, (int) $request->get('per_page', 12)));
     $query = Product::with(['brand', 'unit', 'images']);
 
-    // Фильтр по категории
+    // Фильтр по категории (вся ветка или только прямые товары узла)
     if ($categoryId = $request->get('category_id')) {
         $category = Category::find($categoryId);
         if ($category) {
-            $descendantIds = $this->getDescendantIds($category);
-            $query->whereIn('category_id', $descendantIds);
-        }
-    }
-
-    // Фильтр по брендам
-    if ($brands = $request->get('brands')) {
-        $brands = is_array($brands) ? array_values(array_filter($brands)) : [];
-        if (!empty($brands)) {
-            $allNumeric = collect($brands)->every(fn($v) => is_numeric($v));
-            if ($allNumeric) {
-                $query->whereIn('brand_id', $brands);
+            if ($request->boolean('category_direct_only')) {
+                $query->where('category_id', $category->id);
             } else {
-                $query->whereHas('brand', fn($q) => $q->whereIn('name', $brands));
+                $descendantIds = $this->getDescendantIds($category);
+                $query->whereIn('category_id', $descendantIds);
             }
         }
     }
 
-    // Фильтр по типам
-    if ($types = $request->get('types')) {
+    $brands = $this->normalizeRequestStringList($request, 'brands');
+    if (!empty($brands)) {
+        $allNumeric = collect($brands)->every(fn($v) => is_numeric($v));
+        if ($allNumeric) {
+            $query->whereIn('brand_id', $brands);
+        } else {
+            $query->whereHas('brand', fn($q) => $q->whereIn('name', $brands));
+        }
+    }
+
+    $types = $this->normalizeRequestStringList($request, 'types');
+    if (!empty($types)) {
         $query->whereHas('unit', fn($q) => $q->whereIn('name', $types));
     }
 
@@ -349,13 +403,32 @@ class CatalogController extends Controller
     private function normalizeImagePath(?string $path): ?string
     {
         if (!$path) {
-            return null;
+            return '/images/mikronproduction/nofoto.jpg';
         }
 
         $normalized = '/' . ltrim(trim($path), '/');
         $normalized = preg_replace('#^/_images/_images/#', '/_images/', $normalized);
+        $normalized = str_replace('\\', '/', $normalized);
 
-        return $normalized;
+        if ($this->publicImageExists($normalized)) {
+            return $normalized;
+        }
+
+        // Backward compatibility: old DB data can point to /_images/* while files are already in /images/*
+        if (str_starts_with($normalized, '/_images/')) {
+            $alternative = preg_replace('#^/_images/#', '/images/', $normalized);
+            if ($alternative && $this->publicImageExists($alternative)) {
+                return $alternative;
+            }
+        }
+
+        return '/images/mikronproduction/nofoto.jpg';
+    }
+
+    private function publicImageExists(string $publicPath): bool
+    {
+        $relative = ltrim($publicPath, '/');
+        return File::exists(public_path($relative));
     }
 
     private function getDescendantIds(Category $category): array
@@ -365,5 +438,47 @@ class CatalogController extends Controller
             $ids = array_merge($ids, $this->getDescendantIds($child));
         }
         return $ids;
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string}>
+     */
+    private function breadcrumbsFor(Category $category): array
+    {
+        $items = [];
+        $current = $category;
+        while ($current) {
+            array_unshift($items, [
+                'id'   => $current->id,
+                'name' => $current->name,
+            ]);
+            if (!$current->parent_id) {
+                break;
+            }
+            $current = Category::query()->find($current->parent_id);
+        }
+
+        return $items;
+    }
+
+    /**
+     * Массивы из query (brands[], types[]) или одно значение — в единый список строк.
+     */
+    private function normalizeRequestStringList(Request $request, string $key): array
+    {
+        if (!$request->has($key)) {
+            return [];
+        }
+        $raw = $request->input($key);
+        if (is_array($raw)) {
+            return array_values(array_filter(array_map('strval', $raw), fn($v) => $v !== ''));
+        }
+        if (is_string($raw)) {
+            $raw = trim($raw);
+
+            return $raw === '' ? [] : [$raw];
+        }
+
+        return [];
     }
 }
