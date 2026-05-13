@@ -19,7 +19,7 @@
           <h1 class="product-info__title">{{ product.name }}</h1>
           <div class="product-info__sku">Артикул: {{ product.sku }}</div>
 
-          <div class="product-info__price">{{ formatPrice(product.price) }} ₽</div>
+          <div class="product-info__price">{{ formatProductPriceRub(product.price) }}</div>
 
           <div class="product-info__stock" :class="{ low: product.stock < 10 }">
             <i class="fas fa-check-circle" /> В наличии: {{ product.stock }} шт.
@@ -93,13 +93,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import { useFavoritesStore } from '@/stores/favorites'
 import { addToCart as addToCartUtil } from '@/utils/cart'
 import logoFallback from '@/assets/logo.png'
 import { resolveMediaUrl } from '@/utils/media'
+import { formatProductPriceRub } from '@/utils/price'
 
 const route = useRoute()
 const favoritesStore = useFavoritesStore()
@@ -134,11 +135,6 @@ const fetchProduct = async (id) => {
   } finally {
     loading.value = false
   }
-}
-
-const formatPrice = (price) => {
-  const num = Number(price)
-  return Number.isFinite(num) ? new Intl.NumberFormat('ru-RU').format(num) : price
 }
 
 const increment = () => {

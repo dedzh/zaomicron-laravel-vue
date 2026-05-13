@@ -18,8 +18,8 @@ class CatalogController extends Controller
     {
         return Cache::remember('catalog:filters', now()->addHour(), function () {
             return [
-                'brands' => Brand::orderBy('name')->pluck('name'),
-                'types'  => Unit::orderBy('name')->pluck('name'),
+                'brands' => Brand::orderBy('name')->pluck('name')->values()->all(),
+                'types'  => Unit::orderBy('name')->pluck('name')->values()->all(),
             ];
         });
     }
@@ -123,12 +123,14 @@ class CatalogController extends Controller
         $query->whereHas('unit', fn($q) => $q->whereIn('name', $types));
     }
 
-    // Фильтр по цене
-    if ($minPrice = $request->get('minPrice')) {
-        $query->where('price', '>=', (float) $minPrice);
+    // Фильтр по цене (учитываем 0; не используем truthy-геттеры)
+    $minRaw = $request->input('minPrice');
+    if ($minRaw !== null && $minRaw !== '' && is_numeric($minRaw)) {
+        $query->where('price', '>=', (float) $minRaw);
     }
-    if ($maxPrice = $request->get('maxPrice')) {
-        $query->where('price', '<=', (float) $maxPrice);
+    $maxRaw = $request->input('maxPrice');
+    if ($maxRaw !== null && $maxRaw !== '' && is_numeric($maxRaw)) {
+        $query->where('price', '<=', (float) $maxRaw);
     }
 
     // ===== НОВОЕ: поиск по названию, бренду или old_code =====
@@ -431,13 +433,22 @@ class CatalogController extends Controller
         return File::exists(public_path($relative));
     }
 
-    private function getDescendantIds(Category $category): array
+    private function getDescendantIds(Category $root): array
     {
-        $ids = [$category->id];
-        foreach ($category->children as $child) {
-            $ids = array_merge($ids, $this->getDescendantIds($child));
+        $ids = [];
+        $queue = [(int) $root->id];
+        while (!empty($queue)) {
+            $batch = array_splice($queue, 0, 200);
+            $ids = array_merge($ids, $batch);
+            $next = Category::query()
+                ->whereIn('parent_id', $batch)
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+            $queue = array_merge($queue, $next);
         }
-        return $ids;
+
+        return array_values(array_unique($ids));
     }
 
     /**
@@ -463,13 +474,14 @@ class CatalogController extends Controller
 
     /**
      * Массивы из query (brands[], types[]) или одно значение — в единый список строк.
+     * Не используем has(): для массивов из query has() в ряде случаев ведёт себя неожиданно.
      */
     private function normalizeRequestStringList(Request $request, string $key): array
     {
-        if (!$request->has($key)) {
+        $raw = $request->input($key);
+        if ($raw === null) {
             return [];
         }
-        $raw = $request->input($key);
         if (is_array($raw)) {
             return array_values(array_filter(array_map('strval', $raw), fn($v) => $v !== ''));
         }

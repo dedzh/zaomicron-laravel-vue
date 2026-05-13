@@ -20,7 +20,7 @@
             <h1 class="catalog-title text-h4 font-weight-bold">{{ categoryName }}</h1>
             <div v-if="showBrowseStep && showProductsSection" class="catalog-counter text-medium-emphasis">
               {{ browseChildren.length }} {{ browseChildren.length === 1 ? 'подраздел' : 'подразделов' }}
-              · {{ totalItems }} {{ totalItems === 1 ? 'товар' : 'товаров' }} в этом разделе
+              · {{ totalItems }} {{ totalItems === 1 ? 'товар' : 'товаров' }} в разделе и подкатегориях
             </div>
             <div v-else-if="showProductsSection" class="catalog-counter">{{ totalItems }} товаров</div>
             <div v-else-if="showBrowseStep" class="catalog-counter text-medium-emphasis">
@@ -82,7 +82,7 @@
         </v-alert>
       </v-col>
 
-      <!-- Товары (лист категории, поиск или гибрид: подразделы + товары в текущем узле) -->
+      <!-- Товары: вся ветка категории (включая подкатегории), либо поиск -->
       <template v-if="showProductsSection">
         <v-col cols="12" class="d-md-none animated-rise" style="animation-delay: 60ms">
           <v-btn variant="tonal" block class="catalog-filter-mobile-btn" @click="filterDialog = true">
@@ -96,7 +96,7 @@
         </v-col>
 
         <v-col cols="12" md="9" class="animated-rise" style="animation-delay: 120ms">
-          <h2 v-if="showBrowseStep && showProductsSection" class="text-subtitle-1 font-weight-bold mb-3">Товары в этом разделе</h2>
+          <h2 v-if="showBrowseStep && showProductsSection" class="text-subtitle-1 font-weight-bold mb-3">Товары</h2>
           <v-row v-if="loading">
             <v-col v-for="n in 6" :key="n" cols="12" sm="6" lg="4">
               <v-skeleton-loader type="card" />
@@ -161,6 +161,7 @@ import { useRoute } from 'vue-router';
 import axios from 'axios';
 import ProductCard from '@/components/catalog/ProductCard.vue';
 import FiltersSidebar from '@/components/catalog/FiltersSidebar.vue';
+import { sanitizeFilterPrice } from '@/utils/price';
 
 const route = useRoute();
 const categoryName = ref('Каталог');
@@ -179,10 +180,8 @@ const filters = ref({});
 const browseChildren = ref([]);
 const browseBreadcrumbs = ref([]);
 const browseCategory = ref(null);
-const browseDirectProductsCount = ref(0);
 const browseLoading = ref(false);
 const browseLoaded = ref(false);
-const productsCategoryDirectOnly = ref(false);
 
 const sortOptions = [
   { text: 'По названию', value: 'name_asc' },
@@ -200,11 +199,7 @@ const showBrowseStep = computed(() => {
 
 const showProductsSection = computed(() => {
   if (searchQuery.value) return true;
-  if (!categoryId.value) return false;
-  if (browseChildren.value.length > 0) {
-    return browseDirectProductsCount.value > 0;
-  }
-  return true;
+  return !!categoryId.value;
 });
 
 const emptyRootCatalog = computed(() => (
@@ -225,12 +220,10 @@ async function fetchBrowse() {
     browseChildren.value = Array.isArray(data.children) ? data.children : [];
     browseBreadcrumbs.value = Array.isArray(data.breadcrumbs) ? data.breadcrumbs : [];
     browseCategory.value = data.category || null;
-    browseDirectProductsCount.value = Number(data.direct_products_count) || 0;
   } catch (e) {
     browseChildren.value = [];
     browseBreadcrumbs.value = [];
     browseCategory.value = null;
-    browseDirectProductsCount.value = 0;
     console.error(e);
   } finally {
     browseLoading.value = false;
@@ -269,18 +262,17 @@ function buildProductQueryParams() {
   };
   if (categoryId.value) {
     params.category_id = categoryId.value;
-    if (productsCategoryDirectOnly.value) {
-      params.category_direct_only = 1;
-    }
   }
   if (searchQuery.value) {
     params.q = searchQuery.value;
   }
-  if (f.minPrice !== null && f.minPrice !== undefined && f.minPrice !== '') {
-    params.minPrice = f.minPrice;
+  const minP = sanitizeFilterPrice(f.minPrice);
+  if (minP !== null) {
+    params.minPrice = minP;
   }
-  if (f.maxPrice !== null && f.maxPrice !== undefined && f.maxPrice !== '') {
-    params.maxPrice = f.maxPrice;
+  const maxP = sanitizeFilterPrice(f.maxPrice);
+  if (maxP !== null) {
+    params.maxPrice = maxP;
   }
   if (Array.isArray(f.brands) && f.brands.length) {
     params.brands = f.brands;
@@ -316,45 +308,25 @@ async function loadCatalogView() {
   error.value = null;
 
   if (searchQuery.value) {
-    productsCategoryDirectOnly.value = false;
     browseChildren.value = [];
     browseBreadcrumbs.value = [];
     browseCategory.value = null;
-    browseDirectProductsCount.value = 0;
     await fetchProducts();
     return;
   }
 
   await fetchBrowse();
 
-  const hasChildren = browseChildren.value.length > 0;
-  const hasDirect = browseDirectProductsCount.value > 0;
-
-  if (hasChildren && hasDirect) {
-    productsCategoryDirectOnly.value = true;
-    categoryName.value = browseCategory.value?.name || 'Каталог';
-    await fetchProducts();
-    return;
-  }
-
-  productsCategoryDirectOnly.value = false;
-
-  if (hasChildren) {
-    products.value = [];
-    totalItems.value = 0;
-    lastPage.value = 1;
-    categoryName.value = browseCategory.value?.name || 'Каталог';
-    return;
-  }
-
   if (categoryId.value) {
+    categoryName.value = browseCategory.value?.name || 'Каталог';
     await fetchProducts();
-  } else {
-    products.value = [];
-    totalItems.value = 0;
-    lastPage.value = 1;
-    categoryName.value = 'Каталог';
+    return;
   }
+
+  products.value = [];
+  totalItems.value = 0;
+  lastPage.value = 1;
+  categoryName.value = 'Каталог';
 }
 
 const totalPages = computed(() => lastPage.value);

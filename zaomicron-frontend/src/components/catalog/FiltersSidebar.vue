@@ -43,17 +43,20 @@
           class="mb-2"
         />
         <div class="filters-brand-list">
-          <v-checkbox
+          <button
             v-for="(brand, idx) in visibleBrands"
-            :key="'brand-' + idx"
-            v-model="selectedBrands"
-            multiple
-            :label="brand"
-            :value="brand"
-            density="compact"
-            hide-details
-            color="primary"
-          />
+            :key="'brand-' + idx + '-' + brand"
+            type="button"
+            class="filters-brand-row"
+            :class="{ 'filters-brand-row--on': isBrandSelected(brand) }"
+            @click="toggleBrand(brand)"
+          >
+            <span class="filters-brand-row__icon" aria-hidden="true">
+              <v-icon v-if="isBrandSelected(brand)" size="20" color="primary">mdi-checkbox-marked</v-icon>
+              <v-icon v-else size="20" color="medium-emphasis">mdi-checkbox-blank-outline</v-icon>
+            </span>
+            <span class="filters-brand-row__text">{{ brand }}</span>
+          </button>
         </div>
       </div>
 
@@ -107,17 +110,20 @@
           class="mb-2"
         />
         <div class="filters-brand-list">
-          <v-checkbox
+          <button
             v-for="(brand, idx) in visibleBrands"
-            :key="'brand-' + idx"
-            v-model="selectedBrands"
-            multiple
-            :label="brand"
-            :value="brand"
-            density="compact"
-            hide-details
-            color="primary"
-          />
+            :key="'brand-' + idx + '-' + brand"
+            type="button"
+            class="filters-brand-row"
+            :class="{ 'filters-brand-row--on': isBrandSelected(brand) }"
+            @click="toggleBrand(brand)"
+          >
+            <span class="filters-brand-row__icon" aria-hidden="true">
+              <v-icon v-if="isBrandSelected(brand)" size="20" color="primary">mdi-checkbox-marked</v-icon>
+              <v-icon v-else size="20" color="medium-emphasis">mdi-checkbox-blank-outline</v-icon>
+            </span>
+            <span class="filters-brand-row__text">{{ brand }}</span>
+          </button>
         </div>
       </div>
 
@@ -134,6 +140,7 @@
 <script setup>
 import { ref, computed, onMounted, defineProps, defineEmits } from 'vue';
 import axios from 'axios';
+import { sanitizeFilterPrice } from '@/utils/price';
 
 const props = defineProps({
   inline: {
@@ -161,11 +168,28 @@ const visibleBrands = computed(() => {
   return source.filter((name) => String(name).toLowerCase().includes(q));
 });
 
+function isBrandSelected(brand) {
+  const b = String(brand);
+  return selectedBrands.value.some((x) => String(x) === b);
+}
+
+function toggleBrand(brand) {
+  const b = String(brand);
+  const cur = selectedBrands.value.map((x) => String(x));
+  const i = cur.indexOf(b);
+  if (i === -1) {
+    selectedBrands.value = [...cur, b];
+  } else {
+    cur.splice(i, 1);
+    selectedBrands.value = [...cur];
+  }
+}
+
 onMounted(async () => {
   try {
     const { data } = await axios.get('/api/catalog/filters');
     const raw = Array.isArray(data.brands) ? data.brands : [];
-    brands.value = [...new Set(raw.map((b) => String(b)))];
+    brands.value = [...new Set(raw.map((x) => String(x)))].sort((a, b) => a.localeCompare(b, 'ru'));
   } catch (e) {
     console.error('Ошибка загрузки брендов', e);
   }
@@ -173,9 +197,9 @@ onMounted(async () => {
 
 function applyFilters() {
   emit('apply', {
-    minPrice: minPrice.value,
-    maxPrice: maxPrice.value,
-    brands: selectedBrands.value
+    minPrice: sanitizeFilterPrice(minPrice.value),
+    maxPrice: sanitizeFilterPrice(maxPrice.value),
+    brands: [...selectedBrands.value]
   });
   if (!props.inline) {
     drawer.value = false;
@@ -214,5 +238,46 @@ function resetFilters() {
   max-height: 260px;
   overflow: auto;
   padding-right: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.filters-brand-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  margin: 0;
+  padding: 8px 6px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  line-height: 1.35;
+}
+
+.filters-brand-row:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.filters-brand-row--on {
+  background: rgba(var(--v-theme-primary), 0.08);
+}
+
+.filters-brand-row__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  min-height: 24px;
+}
+
+.filters-brand-row__text {
+  flex: 1;
+  word-break: break-word;
 }
 </style>

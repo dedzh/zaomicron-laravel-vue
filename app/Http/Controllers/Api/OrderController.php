@@ -1,7 +1,12 @@
 <?php
-namespace App\Http\Controllers;
 
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Support\SiteMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class OrderController extends Controller
 {
@@ -20,10 +25,42 @@ class OrderController extends Controller
             'total' => 'required|numeric',
         ]);
 
-        // Здесь сохраняете заказ в БД (например, в таблицу orders)
-        // Либо отправляете уведомление на почту
+        $lines = [];
+        foreach ($validated['items'] as $item) {
+            $lines[] = sprintf(
+                '%s × %s — %s ₽ (арт. %s)',
+                $item['name'],
+                $item['quantity'],
+                number_format((float) $item['price'], 2, '.', ' '),
+                $item['id']
+            );
+        }
 
-        // Пока просто возвращаем успех
+        $rows = [
+            ['label' => 'Имя', 'value' => $validated['name']],
+            ['label' => 'Телефон', 'value' => $validated['phone']],
+            ['label' => 'Email', 'value' => $validated['email']],
+            ['label' => 'Комментарий', 'value' => $validated['comment'] ?? '—'],
+            ['label' => 'Товары', 'value' => implode("\n", $lines)],
+            ['label' => 'Сумма заказа', 'value' => number_format((float) $validated['total'], 2, '.', ' ') . ' ₽'],
+        ];
+
+        try {
+            SiteMail::sendHtml(
+                'Заказ с сайта',
+                $rows,
+                $validated['email'],
+                $validated['name']
+            );
+        } catch (Throwable $e) {
+            Log::error('Mail send failed (order)', ['exception' => $e]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Не удалось отправить заказ. Попробуйте позже.',
+            ], 503);
+        }
+
         return response()->json(['success' => true]);
     }
 }

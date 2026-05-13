@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\CatalogController;
 use App\Http\Controllers\Api\FeedbackController;
-
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ArticleController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +21,7 @@ Route::get('/main/promo',           [CatalogController::class, 'mainPromo']);
 Route::post('/feedback', [FeedbackController::class, 'send']);
 Route::post('/partner', [FeedbackController::class, 'partner']);
 Route::post('/subscribe', [FeedbackController::class, 'subscribe']);
+Route::post('/order', [OrderController::class, 'store']);
 
 
 Route::get('/articles', [ArticleController::class, 'index']);

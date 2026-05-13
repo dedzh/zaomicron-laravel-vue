@@ -20,9 +20,7 @@
           :to="'/product/' + product.id"
           class="product-grid__name"
         >{{ product.name }}</router-link>
-        <span v-if="product.price" class="product-grid__price">
-          {{ formatPrice(product.price) }} ₽
-        </span>
+        <span class="product-grid__price">{{ formatProductPriceRub(product.price) }}</span>
       </div>
     </div>
   </section>
@@ -33,6 +31,7 @@
 import { computed } from 'vue'
 import imageFallback from '@/assets/logo.png'
 import { resolveMediaUrl } from '@/utils/media'
+import { formatProductPriceRub } from '@/utils/price'
 
 const props = defineProps({
   products: {
@@ -42,11 +41,6 @@ const props = defineProps({
 })
 
 const displayList = computed(() => Array.isArray(props.products) ? props.products : [])
-
-const formatPrice = (v) => {
-  const n = Number(v)
-  return Number.isFinite(n) ? new Intl.NumberFormat('ru-RU').format(n) : v
-}
 
 const productImageUrl = (product) => {
   return resolveMediaUrl(product.image || product.image_url, imageFallback)

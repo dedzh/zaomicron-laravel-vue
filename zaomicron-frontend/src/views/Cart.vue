@@ -14,7 +14,7 @@
           <div class="cart-item__info">
             <h3 class="cart-item__name">{{ item.name }}</h3>
             <div v-if="item.sku" class="cart-item__sku">Арт. {{ item.sku }}</div>
-            <div class="cart-item__price">{{ formatPrice(item.price) }} ₽ / шт.</div>
+            <div class="cart-item__price">{{ unitPriceLabel(item) }}</div>
           </div>
 
           <div class="cart-item__qty">
@@ -23,7 +23,7 @@
             <button class="qty-btn" @click="changeQty(item.id, item.quantity + 1)">+</button>
           </div>
 
-          <div class="cart-item__total">{{ formatPrice(lineTotal(item)) }} ₽</div>
+          <div class="cart-item__total">{{ lineTotalLabel(item) }}</div>
           <button class="cart-item__remove" @click="removeItem(item.id)">
             <i class="fas fa-trash-alt" />
           </button>
@@ -32,7 +32,7 @@
 
       <div class="cart__summary">
         <span class="cart__summary-label">Итого:</span>
-        <span class="cart__summary-price">{{ formatPrice(totalPrice) }} ₽</span>
+        <span class="cart__summary-price">{{ summaryTotalLabel }}</span>
         <button class="btn btn-primary btn-lg" @click="proceedToCheckout">Оформить заказ</button>
       </div>
     </template>
@@ -105,11 +105,28 @@ const orderFormRef = ref(null)
 const cartItems = computed(() => cartStore.items)
 const totalPrice = computed(() => cartStore.totalPrice)
 
-const formatPrice = (v) => {
-  const n = Number(v)
-  return Number.isFinite(n) ? new Intl.NumberFormat('ru-RU').format(n) : v
+const nf = new Intl.NumberFormat('ru-RU')
+
+function unitPriceLabel(item) {
+  const n = Number(item.price)
+  if (Number.isFinite(n) && n === 0) return 'по запросу'
+  return `${nf.format(n)} ₽ / шт.`
 }
-const lineTotal = (item) => Number(item.price || 0) * Number(item.quantity || 0)
+
+function lineTotalLabel(item) {
+  const n = Number(item.price)
+  const q = Number(item.quantity || 1)
+  if (Number.isFinite(n) && n === 0) return 'по запросу'
+  if (!Number.isFinite(n) || !Number.isFinite(q)) return '—'
+  return `${nf.format(n * q)} ₽`
+}
+
+const summaryTotalLabel = computed(() => {
+  const t = Number(totalPrice.value)
+  if (Number.isFinite(t) && t === 0) return 'по запросу'
+  if (!Number.isFinite(t)) return '—'
+  return `${nf.format(t)} ₽`
+})
 const changeQty = (id, next) => cartStore.updateQuantity(id, Math.max(1, next))
 const removeItem = (id) => cartStore.removeFromCart(id)
 

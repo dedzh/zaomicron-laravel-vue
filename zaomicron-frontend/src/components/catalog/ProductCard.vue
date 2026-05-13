@@ -20,7 +20,7 @@
     <div class="product-card__body">
       <h3 class="product-card__name">{{ product.name }}</h3>
       <span v-if="product.sku" class="product-card__sku">Арт. {{ product.sku }}</span>
-      <div class="product-card__price">{{ formatPrice(product.price) }} ₽</div>
+      <div class="product-card__price">{{ formatProductPriceRub(product.price) }}</div>
       <button class="product-card__cart-btn" @click.stop="addToCart">
         <i class="fas fa-cart-plus" /> В корзину
       </button>
@@ -34,6 +34,7 @@ import { useCartStore } from '@/stores/cart'
 import { useFavoritesStore } from '@/stores/favorites'
 import logoFallback from '@/assets/logo.png'
 import { resolveMediaUrl } from '@/utils/media'
+import { formatProductPriceRub } from '@/utils/price'
 
 const props = defineProps({
   product: {
@@ -51,11 +52,6 @@ const isFavorite = computed(() => favoritesStore.isFavorite(props.product.id))
 const productImage = computed(() => {
   return resolveMediaUrl(props.product.image || props.product.image_url, logoFallback)
 })
-
-const formatPrice = (price) => {
-  const num = Number(price)
-  return Number.isFinite(num) ? new Intl.NumberFormat('ru-RU').format(num) : price
-}
 
 const addToCart = () => cartStore.addToCart(props.product, 1)
 const toggleFavorite = () => favoritesStore.toggleFavorite(props.product.id)
