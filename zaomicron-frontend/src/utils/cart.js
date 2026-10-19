@@ -1,38 +1,71 @@
-import { getActivePinia } from 'pinia';
-import { useCartStore } from '@/stores/cart';
+import { defineStore } from 'pinia';
 
-function store() {
-    if (!getActivePinia()) {
-        return null;
+export const useCartStore = defineStore('cart', {
+  state: () => ({
+    items: JSON.parse(localStorage.getItem('cart') || '[]'),
+    notifications: []
+  }),
+  getters: {
+    totalQuantity: (state) => state.items.reduce((sum, i) => sum + i.quantity, 0),
+    totalPrice: (state) => state.items.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 1), 0)
+  },
+  actions: {
+    addToCart(product, qty = 1) {
+      const max = Number(product.stock);
+      const existing = this.items.find(i => i.id === product.id);
+      let newQty = qty;
+
+      if (existing) {
+        newQty = existing.quantity + qty;
+      }
+
+      if (!isNaN(max) && max > 0 && max < 9999) {
+        if (newQty > max) {
+          newQty = max;
+          this.addNotification(`Доступно только ${max} шт. товара «${product.name}»`);
+        }
+      }
+
+      if (existing) {
+        existing.quantity = newQty;
+      } else {
+        this.items.push({ ...product, quantity: newQty });
+      }
+      this.save();
+    },
+    removeFromCart(id) {
+      this.items = this.items.filter(i => i.id !== id);
+      this.save();
+    },
+    updateQuantity(id, qty) {
+      const item = this.items.find(i => i.id === id);
+      if (item) {
+        const max = Number(item.stock);
+        let newQty = Math.max(1, qty);
+        if (!isNaN(max) && max > 0 && max < 9999 && newQty > max) {
+          newQty = max;
+          this.addNotification(`Доступно только ${max} шт. товара «${item.name}»`);
+        }
+        item.quantity = newQty;
+        this.save();
+      }
+    },
+    clearCart() {
+      this.items = [];
+      this.save();
+    },
+    loadFromLocalStorage() {
+      this.items = JSON.parse(localStorage.getItem('cart') || '[]');
+    },
+    save() {
+      localStorage.setItem('cart', JSON.stringify(this.items));
+    },
+    addNotification(message) {
+      const id = Date.now();
+      this.notifications.push({ id, message });
+      setTimeout(() => {
+        this.notifications = this.notifications.filter(n => n.id !== id);
+      }, 2500);
     }
-    return useCartStore();
-}
-
-export function addToCart(product, quantity = 1) {
-    const s = store();
-    if (s) {
-        s.addToCart(product, quantity);
-    }
-}
-
-export function updateQuantity(id, delta) {
-    const s = store();
-    if (!s) {
-        return;
-    }
-    const key = id == null ? '' : String(id);
-    const item = s.items.find((x) => String(x.id) === key);
-    if (!item) {
-        return;
-    }
-    const next = Math.max(1, Number(item.quantity || 1) + Number(delta || 0));
-    s.updateQuantity(item.id, next);
-}
-
-export function removeFromCart(id) {
-    store()?.removeFromCart(id);
-}
-
-export function clearCart() {
-    store()?.clearCart();
-}
+  }
+});

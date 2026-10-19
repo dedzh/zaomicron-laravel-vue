@@ -3,11 +3,18 @@
     <button
       class="pagination-item"
       :disabled="currentPage === 1"
-      :aria-disabled="currentPage === 1"
+      @click="changePage(1)"
+      aria-label="Первая страница"
+    >
+      ««
+    </button>
+    <button
+      class="pagination-item"
+      :disabled="currentPage === 1"
       @click="changePage(currentPage - 1)"
       aria-label="Предыдущая страница"
     >
-      ←
+      «
     </button>
 
     <template v-for="page in visiblePages" :key="page">
@@ -26,11 +33,18 @@
     <button
       class="pagination-item"
       :disabled="currentPage === totalPages"
-      :aria-disabled="currentPage === totalPages"
       @click="changePage(currentPage + 1)"
       aria-label="Следующая страница"
     >
-      →
+      »
+    </button>
+    <button
+      class="pagination-item"
+      :disabled="currentPage === totalPages"
+      @click="changePage(totalPages)"
+      aria-label="Последняя страница"
+    >
+      »»
     </button>
   </nav>
 </template>
@@ -48,40 +62,49 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      windowWidth: window.innerWidth,
+    };
+  },
   computed: {
+    delta() {
+      return this.windowWidth < 600 ? 1 : 2;
+    },
     visiblePages() {
       const total = this.totalPages;
       const current = this.currentPage;
-      const delta = 2; // сколько страниц показывать слева и справа от текущей
+      const delta = this.delta;
       const range = [];
-      const rangeWithDots = [];
 
       for (let i = 1; i <= total; i++) {
-        if (
-          i === 1 ||
-          i === total ||
-          (i >= current - delta && i <= current + delta)
-        ) {
+        if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
           range.push(i);
         }
       }
 
-      let last;
+      const result = [];
+      let last = 0;
       for (const i of range) {
-        if (last) {
-          if (i - last === 2) {
-            rangeWithDots.push(last + 1);
-          } else if (i - last !== 1) {
-            rangeWithDots.push('...');
-          }
+        if (last && i - last > 1) {
+          result.push('...');
         }
-        rangeWithDots.push(i);
+        result.push(i);
         last = i;
       }
-      return rangeWithDots;
+      return result;
     },
   },
+  mounted() {
+    window.addEventListener('resize', this.onResize);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.onResize);
+  },
   methods: {
+    onResize() {
+      this.windowWidth = window.innerWidth;
+    },
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.$emit('page-changed', page);
@@ -96,7 +119,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-top: 30px;
   flex-wrap: wrap;
 }
@@ -105,9 +128,9 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  height: 40px;
-  padding: 0 8px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 6px;
   border: 1px solid var(--color-border, #e0e0e0);
   border-radius: 4px;
   background: #fff;
@@ -115,11 +138,12 @@ export default {
   font-size: 14px;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .pagination-item.active {
-  background: #51ae45;
-  border-color: #51ae45;
+  background: var(--color-primary, #51ae45);
+  border-color: var(--color-primary, #51ae45);
   color: white;
   cursor: default;
 }
@@ -137,8 +161,8 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
-  height: 40px;
+  min-width: 36px;
+  height: 36px;
   color: #666;
 }
 </style>

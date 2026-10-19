@@ -9,7 +9,13 @@ class Article extends Model
     protected $table = 'articles';
 
     protected $fillable = [
-        'name', 'code', 'anons', 'text', 'date', 'img_id', 'description'
+        'name',
+        'code',
+        'anons',
+        'text',
+        'date',
+        'img_id',
+        'description'
     ];
 
     protected $casts = [
@@ -25,13 +31,6 @@ class Article extends Model
 
     // Связь с изображением (если есть таблица files)
     // Если нет, можно пока возвращать заглушку
-    public function image()
-    {
-    
-    }
-    public function category()
-    {
-        
-    }
-
+    public function image() {}
+    public function category() {}
 }

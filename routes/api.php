@@ -13,8 +13,10 @@ Route::get('/catalog/products',     [CatalogController::class, 'products']);
 Route::get('/catalog/featured',     [CatalogController::class, 'featured']);
 Route::get('/catalog/search',       [CatalogController::class, 'search']);
 Route::get('/catalog/favorites',    [CatalogController::class, 'favoritesProducts']);
-Route::get('/catalog/category/{id}', [CatalogController::class, 'category']);
+Route::get('/catalog/category/{id}',[CatalogController::class, 'category']);
 Route::get('/catalog/product/{id}', [CatalogController::class, 'product']);
+Route::get('/catalog/related/{id}', [CatalogController::class, 'related']);
+
 
 Route::get('/main/promo',           [CatalogController::class, 'mainPromo']);
 

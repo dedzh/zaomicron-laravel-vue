@@ -10,16 +10,34 @@
     <template v-else>
       <ul class="cart__list">
         <li v-for="item in cartItems" :key="item.id" class="cart-item">
-          <img :src="getImageUrl(item)" :alt="item.name" class="cart-item__img" />
+          <router-link :to="'/product/' + item.id" class="cart-item__img-link">
+            <img
+              :src="getImageUrl(item)"
+              :alt="item.name"
+              class="cart-item__img"
+              @error="handleImageError"
+            />
+          </router-link>
+
           <div class="cart-item__info">
-            <h3 class="cart-item__name">{{ item.name }}</h3>
+            <router-link :to="'/product/' + item.id" class="cart-item__name-link">
+              <h3 class="cart-item__name">{{ item.name }}</h3>
+            </router-link>
             <div v-if="item.sku" class="cart-item__sku">Арт. {{ item.sku }}</div>
             <div class="cart-item__price">{{ unitPriceLabel(item) }}</div>
           </div>
 
           <div class="cart-item__qty">
             <button class="qty-btn" @click="changeQty(item.id, item.quantity - 1)">−</button>
-            <span class="qty-value">{{ item.quantity }}</span>
+            <input
+              type="number"
+              class="qty-input"
+              :value="item.quantity"
+              min="1"
+              :max="getMaxStock(item)"
+              @change="updateQtyFromInput(item.id, $event)"
+              @blur="updateQtyFromInput(item.id, $event)"
+            />
             <button class="qty-btn" @click="changeQty(item.id, item.quantity + 1)">+</button>
           </div>
 
@@ -37,57 +55,89 @@
       </div>
     </template>
 
-    <!-- Диалог оформления -->
-    <v-dialog v-model="showCheckout" max-width="480">
-      <v-card>
-        <v-card-title class="text-h5 font-weight-bold">Оформление заказа</v-card-title>
+    <!-- Диалог оформления  -->
+    <v-dialog v-model="showCheckout" max-width="520">
+      <v-card class="checkout-card">
+        <v-card-title class="checkout-title">Оформление заказа</v-card-title>
         <v-card-text>
-          <v-form ref="orderFormRef" v-model="formValid" @submit.prevent="submitOrder">
-            <v-text-field
-              v-model="orderForm.name"
-              label="Имя *"
-              :rules="[v => !!v || 'Обязательное поле']"
-              required
-            />
-            <v-text-field
-              v-model="orderForm.phone"
-              label="Телефон *"
-              :rules="[v => !!v || 'Обязательное поле']"
-              required
-            />
-            <v-text-field
-              v-model="orderForm.email"
-              label="Email *"
-              type="email"
-              :rules="[v => !!v || 'Обязательное поле', v => /.+@.+\..+/.test(v) || 'Некорректный email']"
-              required
-            />
-            <v-textarea
-              v-model="orderForm.comment"
-              label="Комментарий"
-              rows="3"
-            />
-          </v-form>
+          <form @submit.prevent="submitOrder" class="checkout-form">
+            <div class="form-group">
+              <label for="order-name" class="form-label">Имя *</label>
+              <input
+                id="order-name"
+                v-model="orderForm.name"
+                type="text"
+                class="form-control"
+                required
+                :disabled="submitting"
+              />
+            </div>
+            <div class="form-group">
+              <label for="order-phone" class="form-label">Телефон *</label>
+              <input
+                id="order-phone"
+                v-model="orderForm.phone"
+                type="tel"
+                class="form-control"
+                required
+                :disabled="submitting"
+              />
+            </div>
+            <div class="form-group">
+              <label for="order-email" class="form-label">Email *</label>
+              <input
+                id="order-email"
+                v-model="orderForm.email"
+                type="email"
+                class="form-control"
+                required
+                :disabled="submitting"
+              />
+            </div>
+            <div class="form-group">
+              <label for="order-comment" class="form-label">Комментарий</label>
+              <textarea
+                id="order-comment"
+                v-model="orderForm.comment"
+                class="form-control"
+                rows="3"
+                :disabled="submitting"
+              ></textarea>
+            </div>
+
+            <label class="privacy-check">
+              <input
+                v-model="orderForm.consent"
+                type="checkbox"
+                class="privacy-checkbox"
+                :disabled="submitting"
+              />
+              <span>
+                Я согласен на
+                <router-link to="/privacy" target="_blank" @click.stop>обработку персональных данных</router-link>
+              </span>
+            </label>
+
+            <button
+              type="submit"
+              class="btn btn-primary submit-btn"
+              :disabled="submitting || !orderForm.consent"
+            >
+              <span v-if="submitting" class="spinner"></span>
+              <span v-else>Отправить</span>
+            </button>
+            <div v-if="formMessage" class="form-message" :class="formMessageType">
+              {{ formMessage }}
+            </div>
+          </form>
         </v-card-text>
-        <v-card-actions class="pa-4">
-          <v-spacer />
-          <v-btn variant="text" @click="showCheckout = false">Отмена</v-btn>
-          <v-btn
-            color="primary"
-            :loading="submitting"
-            :disabled="!formValid"
-            @click="submitOrder"
-          >
-            Отправить
-          </v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useCartStore } from '@/stores/cart'
 import axios from 'axios'
 import defaultImage from '@/assets/logo.png'
@@ -98,9 +148,16 @@ cartStore.loadFromLocalStorage()
 
 const showCheckout = ref(false)
 const submitting = ref(false)
-const formValid = ref(false)
-const orderForm = ref({ name: '', phone: '', email: '', comment: '' })
-const orderFormRef = ref(null)
+const formMessage = ref('')
+const formMessageType = ref('success')
+
+const orderForm = reactive({
+  name: '',
+  phone: '',
+  email: '',
+  comment: '',
+  consent: false
+})
 
 const cartItems = computed(() => cartStore.items)
 const totalPrice = computed(() => cartStore.totalPrice)
@@ -127,23 +184,68 @@ const summaryTotalLabel = computed(() => {
   if (!Number.isFinite(t)) return '—'
   return `${nf.format(t)} ₽`
 })
-const changeQty = (id, next) => cartStore.updateQuantity(id, Math.max(1, next))
+
+const getImageUrl = (item) => {
+  return resolveMediaUrl(item.image || item.image_url || item.image_path, defaultImage)
+}
+
+function getMaxStock(item) {
+  const max = Number(item.stock)
+  if (!isNaN(max) && max > 0 && max < 9999) return max
+  return 9999
+}
+
+const changeQty = (id, next) => {
+  const item = cartItems.value.find(i => i.id === id)
+  if (!item) return
+  const max = getMaxStock(item)
+  if (next > max) next = max
+  cartStore.updateQuantity(id, Math.max(1, next))
+}
+
+function updateQtyFromInput(id, event) {
+  const value = parseInt(event.target.value, 10)
+  const item = cartItems.value.find(i => i.id === id)
+  if (!item) return
+  let newVal = value
+  const max = getMaxStock(item)
+  if (isNaN(newVal) || newVal < 1) newVal = 1
+  if (newVal > max) newVal = max
+  cartStore.updateQuantity(id, newVal)
+  event.target.value = newVal
+}
+
 const removeItem = (id) => cartStore.removeFromCart(id)
 
 const proceedToCheckout = () => {
   showCheckout.value = true
+  formMessage.value = ''
 }
-const getImageUrl = (item) => {
-  return resolveMediaUrl(item.image || item.image_url, defaultImage)
+
+const handleImageError = (e) => {
+  if (e?.target) e.target.src = defaultImage
 }
 
 const submitOrder = async () => {
-  const valid = await orderFormRef.value?.validate()
-  if (!valid) return
+  if (!orderForm.name || !orderForm.phone || !orderForm.email) {
+    formMessage.value = 'Заполните обязательные поля'
+    formMessageType.value = 'error'
+    return
+  }
+  if (!orderForm.consent) {
+    formMessage.value = 'Необходимо согласие на обработку данных'
+    formMessageType.value = 'error'
+    return
+  }
+
   submitting.value = true
+  formMessage.value = ''
   try {
     const orderData = {
-      ...orderForm.value,
+      name: orderForm.name,
+      phone: orderForm.phone,
+      email: orderForm.email,
+      comment: orderForm.comment,
       items: cartItems.value.map(item => ({
         id: item.id,
         name: item.name,
@@ -153,25 +255,41 @@ const submitOrder = async () => {
       })),
       total: totalPrice.value
     }
+
     await axios.post('/api/order', orderData)
-    alert('Заказ отправлен!')
+    formMessage.value = 'Заказ отправлен!'
+    formMessageType.value = 'success'
     showCheckout.value = false
-    orderForm.value = { name: '', phone: '', email: '', comment: '' }
+    orderForm.name = ''
+    orderForm.phone = ''
+    orderForm.email = ''
+    orderForm.comment = ''
+    orderForm.consent = false
     cartStore.clearCart()
   } catch (e) {
     console.error(e)
-    alert('Ошибка отправки заказа')
+    formMessage.value = 'Ошибка отправки. Попробуйте позже.'
+    formMessageType.value = 'error'
   } finally {
     submitting.value = false
+    setTimeout(() => {
+      formMessage.value = ''
+    }, 5000)
   }
 }
 </script>
 
 <style scoped>
+/* ===== существующие стили корзины ===== */
 .cart {
   max-width: 960px;
   margin: 32px auto;
   padding: 0 16px;
+}
+
+.cart-item__name-link {
+  text-decoration: none;
+  color: inherit;
 }
 
 .cart__title {
@@ -204,6 +322,7 @@ const submitOrder = async () => {
   margin-bottom: 16px;
   transition: box-shadow 0.2s;
 }
+
 .cart-item:hover {
   box-shadow: 0 6px 20px rgba(0,0,0,0.05);
 }
@@ -257,14 +376,19 @@ const submitOrder = async () => {
   cursor: pointer;
   color: #333;
 }
+
 .qty-btn:hover {
   background: #e0e0e0;
 }
 
-.qty-value {
-  width: 44px;
+.qty-input {
+  width: 60px;
   text-align: center;
-  font-weight: 700;
+  border: none;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  font-size: 16px;
+  padding: 0;
 }
 
 .cart-item__total {
@@ -282,6 +406,7 @@ const submitOrder = async () => {
   cursor: pointer;
   transition: color 0.2s;
 }
+
 .cart-item__remove:hover {
   color: #e53935;
 }
@@ -307,14 +432,153 @@ const submitOrder = async () => {
   color: #156135;
 }
 
+/* ===== стили формы (как в Contacts.vue) ===== */
+.checkout-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 8px 0;
+}
+
+.checkout-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  padding: 0 24px;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0 24px 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #334155;
+  font-size: 14px;
+}
+
+.form-control {
+  padding: 12px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #51ae45;
+  box-shadow: 0 0 0 3px rgba(81, 174, 69, 0.2);
+}
+
+.form-control:disabled {
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+
+.privacy-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 2px;
+}
+
+.privacy-check a {
+  color: #51ae45;
+  text-decoration: underline;
+}
+
+.privacy-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #51ae45;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  background: #51ae45;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #2e7d32;
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.form-message {
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.form-message.success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.form-message.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+/* ===== адаптив ===== */
 @media (max-width: 768px) {
   .cart-item {
     flex-wrap: wrap;
   }
+
   .cart-item__img {
     width: 70px;
     height: 70px;
   }
+
   .cart__summary {
     flex-direction: column;
     align-items: flex-end;

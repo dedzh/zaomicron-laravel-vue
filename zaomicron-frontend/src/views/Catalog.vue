@@ -64,7 +64,16 @@
             >
               <router-link :to="`/catalog/${child.id}`" class="catalog-subcat-card__link">
                 <v-card class="catalog-subcat-card" hover rounded="lg" border>
-                  <v-card-title class="text-h6">{{ child.name }}</v-card-title>
+                  <v-card-title class="d-flex align-center text-h6">
+                    <img
+                      v-if="getCategoryIcon(child)"
+                      :src="getCategoryIcon(child)"
+                      class="catalog-subcat-icon"
+                      @error="onIconError"
+                      alt=""
+                    />
+                    {{ child.name }}
+                  </v-card-title>
                   <v-card-text class="text-body-2 text-medium-emphasis pt-0">
                     {{ child.has_children ? 'Есть вложенные разделы' : 'Перейти к товарам' }}
                   </v-card-text>
@@ -128,11 +137,10 @@
           </v-row>
 
           <div v-if="totalPages > 1" class="d-flex justify-center mt-6">
-            <v-pagination
-              v-model="currentPage"
-              :length="totalPages"
-              color="primary"
-              @update:model-value="changePage"
+            <Pagination
+              :current-page="currentPage"
+              :total-pages="totalPages"
+              @page-changed="changePage"
             />
           </div>
         </v-col>
@@ -161,7 +169,10 @@ import { useRoute } from 'vue-router';
 import axios from 'axios';
 import ProductCard from '@/components/catalog/ProductCard.vue';
 import FiltersSidebar from '@/components/catalog/FiltersSidebar.vue';
+import Pagination from '@/components/ui/Pagination.vue';
 import { sanitizeFilterPrice } from '@/utils/price';
+import logoFallback from '@/assets/logo.png';
+import { resolveMediaUrl } from '@/utils/media';
 
 const route = useRoute();
 const categoryName = ref('Каталог');
@@ -280,14 +291,28 @@ function buildProductQueryParams() {
   if (Array.isArray(f.types) && f.types.length) {
     params.types = f.types;
   }
+  if (f.attrs && typeof f.attrs === 'object') {
+    params.attrs = f.attrs;
+  }
   return params;
 }
 
-/** Laravel ожидает brands[] / types[] для массивов в query */
 function serializeProductQueryParams(params) {
   const usp = new URLSearchParams();
   for (const [key, val] of Object.entries(params)) {
     if (val === null || val === undefined || val === '') {
+      continue;
+    }
+    if (key === 'attrs' && val && typeof val === 'object' && !Array.isArray(val)) {
+      for (const [paramId, values] of Object.entries(val)) {
+        if (!Array.isArray(values) || !values.length) continue;
+        for (const item of values) {
+          if (item === null || item === undefined) continue;
+          const s = String(item);
+          if (s === '') continue;
+          usp.append(`attrs[${paramId}][]`, s);
+        }
+      }
       continue;
     }
     if (Array.isArray(val)) {
@@ -357,6 +382,20 @@ function changePage(page) {
     fetchProducts();
   }
 }
+
+// ========== Новые методы для иконок категорий ==========
+function getCategoryIcon(category) {
+  const url = category?.icon_url || category?.image_url; // подставь своё поле при необходимости
+  if (!url) return null;
+  return resolveMediaUrl(url, logoFallback);
+}
+
+function onIconError(event) {
+  if (event?.target) {
+    event.target.style.display = 'none';
+  }
+}
+// ======================================================
 
 watch([categoryId, searchQuery], () => {
   currentPage.value = 1;
@@ -449,6 +488,15 @@ onMounted(() => {
 
 .catalog-subcat-card__link:hover .catalog-subcat-card {
   transform: translateY(-2px);
+}
+
+/* Иконка подкатегории */
+.catalog-subcat-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  margin-right: 12px;
+  flex-shrink: 0;
 }
 
 .catalog-product-col {

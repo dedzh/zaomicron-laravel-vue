@@ -14,8 +14,13 @@
             </div>
           </header>
 
-          <div v-if="article.image" class="article-image">
-            <img :src="article.image" :alt="article.title" loading="lazy" />
+          <div v-if="articleImage && !imageFailed" class="article-image">
+            <img
+              :src="articleImage"
+              :alt="article.title"
+              loading="lazy"
+              @error="onImageError"
+            />
           </div>
 
           <div class="article-content" v-html="article.content"></div>
@@ -33,6 +38,7 @@
 
 <script>
 import axios from 'axios';
+import { resolveMediaUrl } from '@/utils/media';
 
 export default {
   name: 'BlogArticle',
@@ -41,7 +47,13 @@ export default {
       article: {},
       loading: false,
       error: null,
+      imageFailed: false,
     };
+  },
+  computed: {
+    articleImage() {
+      return resolveMediaUrl(this.article.image, null);
+    },
   },
   watch: {
     '$route.params.slug': {
@@ -55,6 +67,7 @@ export default {
     async fetchArticle(slug) {
       this.loading = true;
       this.error = null;
+      this.imageFailed = false;
       try {
         const { data } = await axios.get(`/api/articles/${slug}`);
         this.article = data;
@@ -65,11 +78,26 @@ export default {
         this.loading = false;
       }
     },
+    onImageError() {
+      this.imageFailed = true;
+    },
   },
 };
 </script>
 
 <style scoped>
+.article-content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 20px auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+.article-content img:hover {
+  transform: scale(1.02);
+}
 .blog-article-page {
   padding: 28px 0 48px;
   font-family: var(--font-body);

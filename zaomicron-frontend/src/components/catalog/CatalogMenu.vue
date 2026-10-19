@@ -12,6 +12,14 @@
             @click="goToCategory(cat.id)"
           >
             <div class="catalog-menu__item-content">
+              <!-- иконка категории -->
+              <img
+                v-if="getCategoryIcon(cat)"
+                :src="getCategoryIcon(cat)"
+                class="catalog-menu__icon"
+                @error="onIconError"
+                alt=""
+              />
               <span>{{ cat.name }}</span>
               <i class="catalog-menu__arrow vi-icon-arrow-right" v-if="cat.children?.length"></i>
             </div>
@@ -19,7 +27,7 @@
         </ul>
       </div>
 
-      <!-- Правая панель: подкатегории выбранной категории -->
+      <!-- Правая панель: подкатегории -->
       <div class="catalog-menu__right" v-if="selectedCategory && selectedCategory.children?.length">
         <div class="catalog-menu__subcategories">
           <div
@@ -28,12 +36,18 @@
             class="catalog-menu__subcategory"
             @click="goToCategory(child.id)"
           >
+            <img
+              v-if="getCategoryIcon(child)"
+              :src="getCategoryIcon(child)"
+              class="catalog-menu__icon"
+              @error="onIconError"
+              alt=""
+            />
             {{ child.name }}
           </div>
         </div>
       </div>
       <div class="catalog-menu__right" v-else-if="selectedCategory">
-        <!-- Если нет подкатегорий, можно показать заглушку -->
         <div class="catalog-menu__empty">Нет подкатегорий</div>
       </div>
     </div>
@@ -42,6 +56,8 @@
 
 <script>
 import axios from 'axios';
+import logoFallback from '@/assets/logo.png';  
+import { resolveMediaUrl } from '@/utils/media';
 
 export default {
   name: 'CatalogMenu',
@@ -82,6 +98,17 @@ export default {
     selectCategory(cat) {
       this.selectedCategory = cat;
     },
+     getCategoryIcon(category) {
+      const url = category?.icon_url || category?.image_url; // подставь своё поле
+      if (!url) return null;
+      return resolveMediaUrl(url, logoFallback);
+    },
+    // При ошибке загрузки просто скрываем <img> (можно заменить на fallback)
+    onIconError(event) {
+      if (event?.target) {
+        event.target.style.display = 'none';
+      }
+    },
     goToCategory(id) {
       this.$router.push(`/catalog/${id}`);
       this.$emit('close');
@@ -91,6 +118,24 @@ export default {
 </script>
 
 <style scoped>
+.catalog-menu__subcategory {
+  display: flex;
+  align-items: center;
+  gap: 8px;              
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #495057;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.catalog-menu__icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;         
+}
 .catalog-menu {
   position: absolute;
   top: 100%;

@@ -2,7 +2,9 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo-mini.png') }}" />
+    <link rel="shortcut icon" type="image/png" href="{{ asset('logo-mini.png') }}" />
+    <link rel="apple-touch-icon" href="{{ asset('logo-mini.png') }}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Завод Микрон - измерительный инструмент, калибры, станки, пробки</title>
 

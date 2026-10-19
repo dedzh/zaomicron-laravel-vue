@@ -14,6 +14,12 @@
           loading="lazy"
           @error="(e) => handleImageError(e)"
         />
+        <span
+          class="product-grid__badge"
+          :class="isInStock(product) ? 'product-grid__badge--ok' : 'product-grid__badge--out'"
+        >
+          {{ isInStock(product) ? 'В наличии' : 'Нет в наличии' }}
+        </span>
       </div>
       <div class="product-grid__info">
         <router-link
@@ -32,6 +38,7 @@ import { computed } from 'vue'
 import imageFallback from '@/assets/logo.png'
 import { resolveMediaUrl } from '@/utils/media'
 import { formatProductPriceRub } from '@/utils/price'
+import { getProductImageCandidates, isProductInStock } from '@/utils/product'
 
 const props = defineProps({
   products: {
@@ -43,8 +50,11 @@ const props = defineProps({
 const displayList = computed(() => Array.isArray(props.products) ? props.products : [])
 
 const productImageUrl = (product) => {
-  return resolveMediaUrl(product.image || product.image_url, imageFallback)
+  const candidates = getProductImageCandidates(product)
+  return resolveMediaUrl(candidates[0], imageFallback)
 }
+
+const isInStock = (product) => isProductInStock(product)
 
 const handleImageError = (event) => {
   if (event?.target) event.target.src = imageFallback
@@ -86,6 +96,26 @@ const handleImageError = (event) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.product-grid__badge {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #fff;
+}
+
+.product-grid__badge--ok {
+  background: rgba(81, 174, 69, 0.92);
+}
+
+.product-grid__badge--out {
+  background: rgba(198, 40, 40, 0.88);
 }
 
 .product-grid__image img {

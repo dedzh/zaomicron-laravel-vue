@@ -3,7 +3,7 @@
     <div class="container">
       <ul class="nav-menu">
         <li class="nav-item">
-          <router-link to="/about" class="nav-link" exact-active-class="active">О кампании</router-link>
+          <router-link to="/about" class="nav-link" exact-active-class="active">О компании</router-link>
         </li>
         <li class="nav-item">
           <router-link to="/catalog" class="nav-link" exact-active-class="active">Каталог</router-link>

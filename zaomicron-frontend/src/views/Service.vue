@@ -13,16 +13,6 @@
         </router-link>
       </div>
 
-      <!-- Карточки основных групп услуг -->
-      <div class="services-grid">
-        <div v-for="svc in mainServices" :key="svc.id" class="service-card">
-          <div class="service-card__icon"><i :class="svc.icon" /></div>
-          <h3 class="service-card__title">{{ svc.title }}</h3>
-          <p class="service-card__desc">{{ svc.description }}</p>
-          <a :href="'#category-' + svc.id" class="btn btn-outline" @click.prevent="scrollToCategory(svc.id)">Подробнее</a>
-        </div>
-      </div>
-
       <!-- Блок о партнёре и преимуществах -->
       <div class="partner-block">
         <div class="partner-block__image">
@@ -43,11 +33,11 @@
         </div>
       </div>
 
-      <!-- Категории СИ -->
+      <!-- Области оказываемых услуг -->
       <div class="categories-section">
         <h2 class="section-title">Области оказываемых услуг</h2>
         
-        <div v-for="cat in serviceCategories" :key="cat.id" class="category-item" :id="'category-' + cat.id">
+        <div v-for="cat in serviceCategories" :key="cat.id" class="category-item">
           <div class="category-item__header">
             <i :class="cat.icon"></i>
             <h3>{{ cat.title }}</h3>
@@ -78,45 +68,6 @@
 
 <script setup>
 import { ref } from 'vue'
-
-const mainServices = [
-  {
-    id: 'linear',
-    icon: 'fas fa-ruler-combined',
-    title: 'Поверка и калибровка линейно-угловых СИ',
-    description: 'Штангенциркули, микрометры, нутромеры, глубиномеры, угломеры, меры длины, линейки, координатные машины.'
-  },
-  {
-    id: 'pressure',
-    icon: 'fas fa-tachometer-alt',
-    title: 'Поверка средств измерений давления и вакуума',
-    description: 'Манометры, вакуумметры, датчики давления, барометры, напоромеры, тягонапоромеры.'
-  },
-  {
-    id: 'temperature',
-    icon: 'fas fa-thermometer-half',
-    title: 'Поверка средств измерений температуры',
-    description: 'Термометры, термопары, термопреобразователи, пирометры, тепловизоры, логгеры температуры.'
-  },
-  {
-    id: 'frequency',
-    icon: 'fas fa-clock',
-    title: 'Поверка средств измерений времени и частоты',
-    description: 'Частотомеры, секундомеры, таймеры, генераторы сигналов, осциллографы.'
-  },
-  {
-    id: 'mass',
-    icon: 'fas fa-weight-hanging',
-    title: 'Поверка средств измерений веса и массы',
-    description: 'Весы лабораторные, весы платформенные, гири, дозаторы, весовые терминалы.'
-  },
-  {
-    id: 'chemical',
-    icon: 'fas fa-flask',
-    title: 'Поверка средств измерений химического состава',
-    description: 'Анализаторы, pH-метры, кондуктометры, хроматографы, спектрофотометры, газоанализаторы.'
-  }
-]
 
 const serviceCategories = ref([
   {
@@ -163,18 +114,12 @@ const serviceCategories = ref([
   }
 ])
 
-const scrollToCategory = (id) => {
-  const el = document.getElementById('category-' + id)
-  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
-
 const imgFallback = (event) => {
   if (event?.target) {
     event.target.style.display = 'none'
   }
 }
 </script>
-
 <style scoped>
 /* ---- ПЕРЕМЕННЫЕ (защита от отсутствия глобальных) ---- */
 .services-page {

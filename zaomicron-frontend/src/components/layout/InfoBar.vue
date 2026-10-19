@@ -19,10 +19,10 @@ export default {
 </script>
 
 <style scoped>
-/* Металлический фон как в Footer */
+/* Металлический фон */
 .header-info-bar {
   position: relative;
-  background: linear-gradient(145deg, #2a313a 0%, #59616b 40%, #232a33 72%, #3a434d 100%);
+  background: linear-gradient(145deg, #333537 0%, #797b7d 40%, #3e464f 72%, #707983 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   padding: 8px 0;
   font-family: var(--font-body);

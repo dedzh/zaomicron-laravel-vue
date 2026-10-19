@@ -32,7 +32,7 @@
             <ul class="footer-links">
               <li><a href="/legalinfo">Правовая информация</a></li>
               <li><a href="/privacy">Политика конфиденциальности</a></li>
-              <li><a href="/services">Услуги</a></li>
+              <li><a href="/service">Услуги</a></li>
             </ul>
           </div>
           <div class="footer-column">
@@ -40,7 +40,7 @@
             <address>
               <p>г. Москва, ул. Электродная, д. 2, стр. 12</p>
               <p>Тел: <a href="tel:+74951234567">+7 (495) 104-72-41</a></p>
-              <p>Email: <a href="mailto:info@zaomicron.ru">micron@microntools.ru</a></p>
+              <p>Email: micron@microntools.ru</p>
             </address>
           </div>
         </div>
@@ -48,7 +48,7 @@
     </div>
     <div class="footer-bottom">
       <div class="container">
-        <p>© 2026 MICRON. Все права защищены.</p>
+        <p>© 2026 АО ТД «Завод «Микрон»» . Все права защищены.</p>
         <p>
           <a href="/privacy">Политика конфиденциальности</a> |
         </p>

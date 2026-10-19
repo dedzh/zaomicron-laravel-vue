@@ -38,8 +38,8 @@
 
 <script>
 import img1 from '@/assets/slider_1.jpg'
-
-import img3 from '@/assets/slider_5.jpg'
+import img2 from '@/assets/slider_2.jpg'
+import img3 from '@/assets/slider_3.jpg'
 
 export default {
   name: 'HeroSlider',
@@ -52,24 +52,25 @@ export default {
       internalSlides: [
         {
           style: { backgroundImage: `linear-gradient(to right, rgba(0, 8, 20, 0.9) 0%, rgba(0, 8, 20, 0.7) 30%, rgba(0, 8, 20, 0.4) 60%, rgba(0, 8, 20, 0) 100%), url(${img1})` },
-          line1: 'ПОСТАВКА ВЫСОКОКАЧЕСТВЕННОГО ИНСТРУМЕНТА',
-          line2: 'на промышленные мероприятия от производителя',
+          line1: 'НАДЁЖНОСТЬ, ПРОВЕРЕННАЯ СТАЛЬЮ',
+          line2: 'от идеи до готового решения',
           btnText: 'Каталог',
           iconClass: 'fas fa-box',
           link: '/catalog'
         },
-        /*{
+        {
           style: { backgroundImage: `linear-gradient(to right, rgba(0, 8, 20, 0.9) 0%, rgba(0, 8, 20, 0.7) 30%, rgba(0, 8, 20, 0.4) 60%, rgba(0, 8, 20, 0) 100%), url(${img2})` },
-          line1: 'АО ТД «Завод «Микрон» присвоен статус «Успешный поставщик»',
-          line2: '«Успешный поставщик»',
-          /*btnText: '',
-          iconClass: 'fas fa-cog',
-          link: '/catalog
-        },*/
+          line1: 'АО ТД «ЗАВОД «МИКРОН» ',
+          line2: 'Статус «Успешный поставщик»—ваш гарант качества',
+          btnText: 'Каталог',
+          iconClass: 'fas fa-box',
+          link: '/catalog'
+          
+        },
         {
           style: { backgroundImage: `linear-gradient(to right, rgba(0, 8, 20, 0.9) 0%, rgba(0, 8, 20, 0.7) 30%, rgba(0, 8, 20, 0.4) 60%, rgba(0, 8, 20, 0) 100%), url(${img3})` },
-          line1: '',
-          line2: '',
+          line1: 'ГОТОВЫ ПРЕДЛОЖИТЬ ЛУЧШЕЕ',
+          line2: 'От стандарта до уникальной оснастки',
           btnText: 'Подобрать',
           iconClass: 'fas fa-search',
           link: '/catalog'
@@ -153,7 +154,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  color: white;
+  color: rgb(164, 227, 157);
 }
 .slide-text { margin-bottom: 30px; }
 .slide-line {

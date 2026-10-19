@@ -1,6 +1,6 @@
 const ABSOLUTE_URL_RE = /^(?:https?:)?\/\//i
 
-const trimTrailingSlash = (value) => value.replace(/\/+$/, '')
+const trimTrailingSlash = (value = '') => value.replace(/\/+$/, '')
 
 export const getBackendOrigin = () => {
   const configured =
@@ -10,25 +10,23 @@ export const getBackendOrigin = () => {
 
   if (typeof window === 'undefined') return ''
 
-  // Local dev frontend usually runs on 5173, backend on 8000.
-  if (window.location.hostname === 'localhost' && window.location.port === '5173') {
-    return 'http://localhost:8000'
-  }
-
   return window.location.origin
 }
 
-export const resolveMediaUrl = (rawPath, fallback = '') => {
-  if (!rawPath || typeof rawPath !== 'string') return fallback
+export function resolveMediaUrl(url, fallback) {
+  if (!url) return fallback
 
-  const normalized = rawPath.trim().replace(/\\\//g, '/')
-  if (!normalized) return fallback
-
-  if (ABSOLUTE_URL_RE.test(normalized) || normalized.startsWith('data:')) {
-    return normalized
+  if (ABSOLUTE_URL_RE.test(url)) {
+    return url
   }
 
-  const backendOrigin = getBackendOrigin()
-  const cleanPath = normalized.replace(/^\/+/, '')
-  return backendOrigin ? `${backendOrigin}/${cleanPath}` : `/${cleanPath}`
+  const clean = String(url)
+    .replace(/\\+/g, '/')
+    .replace(/\/{2,}/g, '/')
+
+  if (clean.startsWith('/')) {
+    return clean
+  }
+
+  return `/${clean.replace(/^\/+/, '')}`
 }

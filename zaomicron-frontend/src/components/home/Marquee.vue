@@ -42,13 +42,13 @@ export default {
           link: `/news/${item.id}`
         }));
         this.newsItems = [
-          { text: 'Новинка: расширенная линейка MICRON уже в каталоге', link: '/catalog' },
+          { text: 'Новинка: расширенная линейка уже в каталоге', link: '/catalog' },
           ...apiItems
         ];
       } catch (err) {
         console.error('Ошибка загрузки новостей', err);
         this.newsItems = [
-          { text: 'Новости MICRON: новые поступления и спецпредложения каждую неделю', link: '/catalog' }
+          { text: 'Новости АО ТД «Завод «Микрон» Микрон» новые поступления и спецпредложения каждую неделю', link: '/catalog' }
         ];
         this.error = null;
       } finally {

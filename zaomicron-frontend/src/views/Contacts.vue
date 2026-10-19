@@ -70,10 +70,24 @@
                 :disabled="isLoading"
               ></textarea>
             </div>
+
+            <label class="privacy-check">
+              <input
+                v-model="form.consent"
+                type="checkbox"
+                class="privacy-checkbox"
+                :disabled="isLoading"
+              />
+              <span>
+                Я согласен на
+                <router-link to="/privacy" target="_blank">обработку персональных данных</router-link>
+              </span>
+            </label>
+
             <button
               type="submit"
               class="btn btn-primary submit-btn"
-              :disabled="isLoading"
+              :disabled="isLoading || !form.consent"
             >
               <span v-if="isLoading" class="spinner"></span>
               <span v-else>Отправить</span>
@@ -120,8 +134,7 @@ export default {
         {
           iconClass: 'fas fa-phone-alt',
           label: 'Телефоны',
-          value: '	+7 (495) 775-24-75 многоканальный <br>+7 (800) 505-21-87 (звонок по России бесплатный пн. - пт.: 9:00 – 17.30)'
-
+          value: '+7 (495) 775-24-75 многоканальный<br>+7 (800) 505-21-87 (звонок по России бесплатный пн. - пт.: 9:00 – 17.30)'
         },
         {
           iconClass: 'fas fa-envelope',
@@ -138,7 +151,8 @@ export default {
         name: '',
         phone: '',
         email: '',
-        message: ''
+        message: '',
+        consent: false
       },
       isLoading: false,
       formMessage: '',
@@ -148,14 +162,20 @@ export default {
   methods: {
     async sendMessage() {
       this.formMessage = '';
+
+      if (!this.form.consent) {
+        this.formMessage = 'Необходимо согласие на обработку персональных данных.';
+        this.formMessageType = 'error';
+        return;
+      }
+
       this.isLoading = true;
 
       try {
-      
         await axios.post('/api/feedback', this.form);
         this.formMessage = 'Сообщение успешно отправлено!';
         this.formMessageType = 'success';
-        this.form = { name: '', phone: '', email: '', message: '' };
+        this.form = { name: '', phone: '', email: '', message: '', consent: false };
       } catch (error) {
         console.error(error);
         this.formMessage = 'Ошибка отправки. Попробуйте позже.';
@@ -164,7 +184,7 @@ export default {
         this.isLoading = false;
         setTimeout(() => {
           this.formMessage = '';
-      },7000);
+        }, 7000);
       }
     }
   }
@@ -172,7 +192,6 @@ export default {
 </script>
 
 <style scoped>
-/* Fallback для CSS-переменных */
 .contacts-page {
   --color-border: #e0e0e0;
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -334,6 +353,31 @@ export default {
 .form-control:disabled {
   background: #f8fafc;
   cursor: not-allowed;
+}
+
+/* Чекбокс согласия */
+.privacy-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 2px;
+}
+
+.privacy-check a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.privacy-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .submit-btn {

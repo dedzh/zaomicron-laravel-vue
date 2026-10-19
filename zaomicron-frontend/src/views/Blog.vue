@@ -15,8 +15,21 @@
       </div>
 
       <div v-else class="blog-grid">
-        <article v-for="article in articles" :key="article.id" class="blog-card card">
-          <div class="blog-card-image" aria-hidden="true">{{ article.emoji }}</div>
+        <article
+          v-for="article in articles"
+          :key="article.id"
+          class="blog-card card animated-card"
+        >
+          <div class="blog-card-image">
+            <img
+              v-if="article.image"
+              :src="getArticleImage(article)"
+              :alt="article.title"
+              class="blog-card-img"
+              @error="onImageError(article, $event)"
+            />
+            <span v-else class="blog-card-emoji">{{ article.emoji || '📰' }}</span>
+          </div>
           <div class="blog-card-body">
             <div class="blog-meta">
               <time :datetime="article.date_iso">{{ article.date }}</time>
@@ -42,6 +55,7 @@
 <script>
 import axios from 'axios';
 import Pagination from '@/components/ui/Pagination.vue';
+import { resolveMediaUrl } from '@/utils/media';   // <-- добавлен импорт
 
 export default {
   name: 'Blog',
@@ -93,11 +107,59 @@ export default {
       this.currentPage = page;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
+    getArticleImage(article) {
+      // Используем resolveMediaUrl для получения полного URL
+      return resolveMediaUrl(article.image, null);
+    },
+    onImageError(article, event) {
+      const img = event.target;
+      img.style.display = 'none';
+      const parent = img.parentNode;
+      if (!parent.querySelector('.blog-card-emoji')) {
+        const emoji = document.createElement('span');
+        emoji.className = 'blog-card-emoji';
+        emoji.textContent = article.emoji || '📰';
+        parent.appendChild(emoji);
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
+
+.animated-card {
+  animation: cardFadeIn 0.6s ease both;
+}
+@keyframes cardFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.blog-card-image {
+  height: 200px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.blog-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.blog-card:hover .blog-card-img {
+  transform: scale(1.05);
+}
+.blog-card-emoji {
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
 .blog-page { padding: 28px 0 48px; }
 .blog-header { margin-bottom: 28px; text-align: center; }
 .blog-title {
@@ -114,12 +176,6 @@ export default {
   margin-top: 20px;
 }
 .blog-card { display: flex; flex-direction: column; }
-.blog-card-image {
-  font-size: 2.75rem;
-  text-align: center;
-  padding: 28px 16px;
-  background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
-}
 .blog-card-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
 .blog-meta {
   display: flex;

@@ -51,7 +51,7 @@ export default {
       catalogs: [
         {
           id: 1,
-          title: 'Каталог Micron',
+          title: 'Каталог измерительного инструмента',
           description: 'Полный каталог измерительного инструмента, калибров, слесарного и металлорежущего инструмента.',
           pdfUrl: catIzmerPdf,
           coverImage: coverMicron

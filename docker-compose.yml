@@ -1,0 +1,49 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: zaomicron-app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: base64:5rCS++h0n9ARFhizNidouGz6NylI2HloTg9GlXb3TPc=
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: zaomicron_demo
+      DB_USERNAME: zaomicron
+      DB_PASSWORD: zaomicron
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      SESSION_DRIVER: file
+      MAIL_MAILER: log
+      MAIL_FROM_ADDRESS: test@gmail.com
+      MAIL_FROM_NAME: Zaomicron
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+
+  db:
+    image: mysql:8.4
+    container_name: zaomicron-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: zaomicron_demo
+      MYSQL_USER: zaomicron
+      MYSQL_PASSWORD: zaomicron
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+
+volumes:
+  mysql_data:

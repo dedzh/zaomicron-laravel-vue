@@ -22,6 +22,10 @@ class Product extends Model
         'is_active',
     ];
 
+    protected $appends = [
+        'image_url',
+    ];
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id', 'id');
@@ -42,28 +46,22 @@ class Product extends Model
         return $this->hasMany(ProductImage::class, 'product_id', 'id');
     }
 
-    // Аксессор для основного изображения
     public function getImageUrlAttribute(): ?string
     {
         $firstImage = $this->relationLoaded('images')
             ? $this->images->first()
             : $this->images()->first();
 
-        if ($firstImage && !empty($firstImage->image_path)) {
-            return $this->normalizeImagePath($firstImage->image_path);
+        if (!$firstImage || !$firstImage->image_path) {
+            return null;
         }
 
-        return null;
+        $path = str_replace('\\', '/', trim((string) $firstImage->image_path));
+        return '/' . ltrim($path, '/');
     }
-
-    private function normalizeImagePath(string $path): string
-    {
-        $normalized = '/' . ltrim(trim($path), '/');
-
-        // Старые данные могут содержать удвоенный сегмент _images/_images.
-        // На сервере каталог обычно монтируется как /_images/...
-        $normalized = preg_replace('#^/_images/_images/#', '/_images/', $normalized);
-
-        return $normalized;
-    }
+    
+public function jamItem()
+{
+    return $this->hasOne(\App\Models\JamCatalogItem::class, 'article', 'old_code');
+}
 }
