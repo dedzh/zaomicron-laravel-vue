@@ -16,9 +16,15 @@
 /public/build
 /public/hot
 /public/storage
+/public/uploads/
 /storage/*.key
 /storage/pail
+/storage/logs/*
+!/storage/logs/.gitignore
 /vendor
+*.mp4
+*.mov
+*.webm
 Homestead.json
 Homestead.yaml
 Thumbs.db
