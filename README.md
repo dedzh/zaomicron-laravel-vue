@@ -13,7 +13,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.4-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 
-[📖 О проекте](#-о-проекте) • [✨ Возможности](#-возможности) • [🛠 Технологии](#-технологии) • [📁 Структура](#-структура-проекта) • [🚀 Запуск](#-запуск) • [📄 Лицензия](#-лицензия) • [📬 Контакты](#-контакты)
+[📖 О проекте](#-о-проекте) • [🎬 Демонстрация](#-видео-демонстрация) • [✨ Возможности](#-возможности) • [🛠 Технологии](#-технологии) • [📁 Структура](#-структура-проекта) • [🚀 Запуск](#-запуск) • [📄 Лицензия](#-лицензия) • [📬 Контакты](#-контакты)
 
 </div>
 
@@ -28,6 +28,17 @@
 * Проект полностью контейнеризирован с помощью Docker для быстрого и удобного развертывания.
 
 > ⚠️ **Важное замечание:** Название «Zaomicron» и все материалы проекта используются исключительно в демонстрационных целях в рамках личного портфолио автора.
+
+---
+
+## 🎬 Видео-демонстрация
+
+<div align="center">
+  <video src="./zaomicron-frontend/src/assets/video/demo.mp4" controls muted playsinline preload="metadata" width="100%" style="max-width: 900px; border-radius: 8px;">
+    Ваш браузер не поддерживает встроенное воспроизведение видео. 
+    <a href="./zaomicron-frontend/src/assets/video/demo.mp4">Скачать видеодемонстрацию</a>.
+  </video>
+</div>
 
 ---
 
@@ -68,6 +79,10 @@
 ├── routes/                    # Определение Web- и API-маршрутов
 ├── tests/                     # Автотесты (PHPUnit)
 ├── zaomicron-frontend/        # Исходный код SPA-приложения на Vue.js
+│   └── src/
+│       └── assets/
+│           └── video/
+│               └── demo.mp4   # 🎬 Видео-ролик демонстрации интерфейса
 ├── Dockerfile                 # Инструкции сборки контейнера приложения
 ├── docker-compose.yml         # Сценарий развертывания локального окружения
 ├── composer.json              # Зависимости Backend (PHP)
